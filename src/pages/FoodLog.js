@@ -7,6 +7,10 @@ function FoodLog() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      console.error('Usuario no autenticado');
+      return;
+    }
     try {
       await addDoc(collection(db, 'foodLogs'), {
         userId: currentUser.uid, // Usar currentUser en lugar de auth.currentUser

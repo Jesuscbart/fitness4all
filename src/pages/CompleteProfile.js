@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, setDoc, Timestamp } from 'firebase/firestore';
 import { AuthContext } from '../contexts/AuthContext';
 import { db } from '../firebaseConfig';
 
@@ -30,6 +30,15 @@ function CompleteProfile() {
         weight,
         // Otros campos
       });
+
+      const measurementDocRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
+      await setDoc(measurementDocRef, {
+        timestamp: Timestamp.now(),
+        weight,
+        height,
+        // Otros campos de medidas
+      });
+
       console.log('Perfil actualizado');
       navigate('/'); // Redirige al Dashboard u otra página
     } catch (error) {

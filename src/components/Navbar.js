@@ -34,6 +34,9 @@ function Navbar() {
               <Link to="/food-log">Dietas</Link>
             </li>
             <li>
+              <Link to="/history">Historial</Link>
+            </li>
+            <li>
               <button onClick={handleSignOut}>Cerrar Sesión</button>
             </li>
           </>

@@ -16,6 +16,7 @@ function SignUp() {
         const user = userCredential.user;
         // Guarda el usuario en Firestore
         await setDoc(doc(db, 'users', user.uid), {
+          name: '', // Puedes pedir el nombre en el formulario de registro si lo deseas
           email: user.email,
           // Otros datos que quieras almacenar
         });

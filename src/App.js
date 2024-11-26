@@ -9,6 +9,10 @@ import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import CompleteProfile from './pages/CompleteProfile';
 import ExerciseLog from './pages/ExerciseLog';
+import History from './pages/History';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
 
 function App() {
   return (
@@ -41,6 +45,12 @@ function App() {
           <Route path="/exercise-log" element={
               <PrivateRoute>
                 <ExerciseLog />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/history" element={
+              <PrivateRoute>
+                <History />
               </PrivateRoute>
             }
           />
