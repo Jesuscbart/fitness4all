@@ -16,16 +16,23 @@ function History() {
       }
       const weightQuery = query(collection(db, 'users', currentUser.uid, 'measurements'));
       const querySnapshot = await getDocs(weightQuery);
-      const weights = querySnapshot.docs.map(doc => ({
-        date: doc.data().timestamp.toDate(),
-        weight: doc.data().weight
-      }));
+      const weights = querySnapshot.docs
+        .map(doc => {
+          const data = doc.data();
+          return {
+            date: data.timestamp.toDate(),
+            weight: data.weight ? parseFloat(data.weight) : null
+          };
+        })
+        .filter(entry => entry.weight); // Filtrar entradas sin peso válido
+
+      // Ordenar los datos por fecha ascendente
+      weights.sort((a, b) => a.date - b.date);
+
       setWeightData(weights);
     };
 
-    if (currentUser) {
-      fetchWeightData();
-    }
+    fetchWeightData();
   }, [currentUser]);
 
   const weightChartData = {

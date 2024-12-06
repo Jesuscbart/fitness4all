@@ -41,7 +41,7 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h2>Iniciar Sesión</h2>
       <button onClick={handleGoogleSignIn}>Iniciar sesión con Google</button>
     </div>

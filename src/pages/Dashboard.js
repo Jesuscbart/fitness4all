@@ -5,19 +5,20 @@ import { db } from '../firebaseConfig';
 import { doc, getDoc, updateDoc, Timestamp, collection, setDoc } from 'firebase/firestore';
 import { Line } from 'react-chartjs-2';
 import { query, where, getDocs } from 'firebase/firestore';
+import './Dashboard.css'; // Importar los estilos del modal
 
 function Dashboard() {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    name: '',
     age: '',
     height: '',
     weight: ''
   });
   const [weightData, setWeightData] = useState([]);
   const [weightDate, setWeightDate] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const calculateBMI = (height, weight) => {
     if (height && weight) {
@@ -60,6 +61,10 @@ function Dashboard() {
       date: doc.data().timestamp.toDate(),
       weight: doc.data().weight
     }));
+
+    // Ordenar los datos por fecha ascendente
+    weights.sort((a, b) => a.date - b.date);
+
     setWeightData(weights);
   };
 
@@ -114,98 +119,81 @@ function Dashboard() {
 
     try {
       await updateDoc(userDocRef, updatedData);
+
+      // Registrar el peso en la colección 'measurements'
+      const weightLogRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
+      await setDoc(weightLogRef, {
+        timestamp: weightDate ? Timestamp.fromDate(new Date(weightDate)) : Timestamp.now(),
+        weight: formData.weight,
+        // Otros campos de medidas
+      });
+
       const updatedUserDoc = await getDoc(userDocRef);
       setUserData(updatedUserDoc.data());
       alert('Datos actualizados correctamente');
+      fetchWeightData(); // Actualizar los datos de peso
     } catch (error) {
       console.error('Error al actualizar los datos:', error);
     }
   };
 
-  const handleWeightLog = async (e) => {
-    e.preventDefault();
-    if (!weightDate || !formData.weight) {
-      alert('Por favor, selecciona una fecha y un peso.');
-      return;
-    }
-    try {
-      const weightLogRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
-      await setDoc(weightLogRef, {
-        timestamp: Timestamp.fromDate(new Date(weightDate)),
-        weight: formData.weight,
-        height: formData.height,
-        // Otros campos de medidas
-      });
-      alert('Peso registrado correctamente');
-      fetchWeightData(); // Actualiza los datos de peso
-    } catch (error) {
-      console.error('Error al registrar el peso:', error);
-    }
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   if (loading) {
     return <div>Cargando...</div>;
   }
 
-  const weightChartData = {
-    labels: weightData.map(entry => entry.date.toLocaleDateString()),
-    datasets: [
-      {
-        label: 'Peso',
-        data: weightData.map(entry => entry.weight),
-        fill: false,
-        backgroundColor: 'blue',
-        borderColor: 'blue'
-      }
-    ]
-  };
-
   return (
     <div className="dashboard">
       <h1>Bienvenido, {userData?.name}</h1>
+      {/* Botón para abrir el modal */}
+      <button onClick={handleOpenModal}>Introducir Datos</button>
+
+      {/* Mostrar el modal si isModalOpen es true */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <button className="close-button" onClick={handleCloseModal}>X</button>
+            <form onSubmit={handleUpdate}>
+              {/* Eliminar el campo "nombre" */}
+              <div>
+                <label htmlFor="age">Edad:</label>
+                <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} />
+              </div>
+              <div>
+                <label htmlFor="height">Altura (cm):</label>
+                <input type="number" id="height" name="height" value={formData.height} onChange={handleChange} />
+              </div>
+              <div>
+                <label htmlFor="weight">Peso (kg):</label>
+                <input type="number" id="weight" name="weight" value={formData.weight} onChange={handleChange} />
+              </div>
+              <div>
+                <label htmlFor="weightDate">Fecha del Peso:</label>
+                <input type="date" id="weightDate" name="weightDate" value={weightDate} onChange={(e) => setWeightDate(e.target.value)} required />
+              </div>
+              <button type="submit">Guardar Datos</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Mostrar datos del usuario */}
       {userData && (
         <div>
-          <p>Nombre: {userData.name}</p>
           <p>Edad: {userData.age}</p>
           <p>Altura: {userData.height} cm</p>
           <p>Peso: {userData.weight} kg</p>
           <p>IMC: {calculateBMI(userData.height, userData.weight)}</p>
-          {/* Agrega aquí otros datos del usuario que desees mostrar */}
+          {/* Otros datos que desees mostrar */}
         </div>
       )}
-      <form onSubmit={handleUpdate}>
-        <div>
-          <label htmlFor="name">Nombre:</label>
-          <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="age">Edad:</label>
-          <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="height">Altura (cm):</label>
-          <input type="number" id="height" name="height" value={formData.height} onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="weight">Peso (kg):</label>
-          <input type="number" id="weight" name="weight" value={formData.weight} onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="weightDate">Fecha del Peso:</label>
-          <input type="date" id="weightDate" name="weightDate" value={weightDate} onChange={(e) => setWeightDate(e.target.value)} required />
-        </div>
-        <button type="submit">Actualizar Datos</button>
-      </form>
-      <form onSubmit={handleWeightLog}>
-        <button type="submit">Registrar Peso</button>
-      </form>
-      {weightData.length > 0 && (
-        <div>
-          <h2>Progresión del Peso</h2>
-          <Line data={weightChartData} />
-        </div>
-      )}
-      {/* Resto del contenido del Dashboard */}
     </div>
   );
 }
