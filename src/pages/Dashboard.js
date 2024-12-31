@@ -19,6 +19,7 @@ function Dashboard() {
   const [weightData, setWeightData] = useState([]);
   const [weightDate, setWeightDate] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [goal, setGoal] = useState('');
 
   const calculateBMI = (height, weight) => {
     if (height && weight) {
@@ -194,6 +195,17 @@ function Dashboard() {
           {/* Otros datos que desees mostrar */}
         </div>
       )}
+
+      {/* Sección para introducir objetivos */}
+      <div className="goal-section">
+        <p>Cuéntame cuáles son tus objetivos:</p>
+        <input
+          type="text"
+          value={goal}
+          onChange={(e) => setGoal(e.target.value)}
+          placeholder="Escribe tus objetivos aquí..."
+        />
+      </div>
     </div>
   );
 }

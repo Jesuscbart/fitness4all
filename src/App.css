@@ -39,8 +39,8 @@
 
 /* Estilos generales */
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f2f5;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #e9ecef;
   margin: 0;
   padding: 0;
 }
@@ -131,4 +131,21 @@ form button:hover {
 
 .dashboard p {
   color: #666;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.chart-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+  }
 }

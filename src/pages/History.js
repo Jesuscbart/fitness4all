@@ -52,7 +52,9 @@ function History() {
     <div>
       <h2>Historial de Peso</h2>
       {weightData.length > 0 ? (
-        <Line data={weightChartData} />
+        <div className="chart-container">
+          <Line data={weightChartData} />
+        </div>
       ) : (
         <p>No hay datos de peso disponibles.</p>
       )}

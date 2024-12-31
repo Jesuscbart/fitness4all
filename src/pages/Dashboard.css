@@ -1,9 +1,31 @@
 .dashboard {
   padding: 20px;
+  text-align: center; /* Centrar el contenido */
 }
 
 .dashboard h1 {
   color: #007bff;
+}
+
+.dashboard button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+
+.dashboard button:hover {
+  background-color: #0056b3;
+}
+
+.dashboard p {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 10px 0;
 }
 
 .modal-overlay {
@@ -64,4 +86,22 @@
 
 .modal form button:hover {
   background-color: #0056b3;
+}
+
+.goal-section {
+  margin-top: 20px;
+}
+
+.goal-section p {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.goal-section input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
 }
