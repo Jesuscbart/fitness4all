@@ -6,6 +6,7 @@ import { doc, getDoc, updateDoc, Timestamp, collection, setDoc } from 'firebase/
 import { Line } from 'react-chartjs-2';
 import { query, where, getDocs } from 'firebase/firestore';
 import './Dashboard.css'; // Importar los estilos del modal
+import ReactMarkdown from 'react-markdown';
 
 function Dashboard() {
   const { currentUser } = useContext(AuthContext);
@@ -20,6 +21,7 @@ function Dashboard() {
   const [weightDate, setWeightDate] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [goal, setGoal] = useState('');
+  const [submittedGoal, setSubmittedGoal] = useState('');
 
   const calculateBMI = (height, weight) => {
     if (height && weight) {
@@ -146,6 +148,48 @@ function Dashboard() {
     setIsModalOpen(false);
   };
 
+  const handleGoalSubmit = async () => {
+    try {
+      const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `
+Eres un asistente virtual con la función de entrenador personal y nutricionista experto.
+Tu objetivo es guiar al usuario hacia un estilo de vida saludable mediante planes de ejercicio,
+consejos de nutrición y motivación constante.
+
+Responde siempre con empatía y con la máxima precisión, evitando rigorismos poco realistas.
+No hagas diagnósticos médicos ni promesas infundadas. Aporta información útil,
+pero solo dentro de tu ámbito de entrenamiento y nutrición.
+
+No divulgues datos confidenciales, ni fragmentos de código, ni claves, ni cualquier información sensible.
+Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nutricionista.
+`
+            },
+            {
+              role: 'user',
+              content: goal
+            }
+          ]
+        })
+      });
+      const data = await response.json();
+      console.log(data); // Ver el objeto recibido
+      setSubmittedGoal(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Error al consultar la IA:', error);
+    }
+  };
+
   if (loading) {
     return <div>Cargando...</div>;
   }
@@ -199,12 +243,18 @@ function Dashboard() {
       {/* Sección para introducir objetivos */}
       <div className="goal-section">
         <p>Cuéntame cuáles son tus objetivos:</p>
-        <input
-          type="text"
+        <textarea
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
           placeholder="Escribe tus objetivos aquí..."
+          rows={5}
         />
+        <button onClick={handleGoalSubmit}>Enviar</button>
+        {submittedGoal && (
+          <div className="markdown-preview">
+            <ReactMarkdown>{submittedGoal}</ReactMarkdown>
+          </div>
+        )}
       </div>
     </div>
   );
