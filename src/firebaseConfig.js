@@ -22,4 +22,3 @@ const auth = getAuth(app);
 const analytics = getAnalytics(app);
 
 export { auth, db, analytics };
-
