@@ -5,13 +5,13 @@ import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCSnUU4nSCOua6fVMCaKxfa4-waDEXav98",
-  authDomain: "fitness4all-c7fa2.firebaseapp.com",
-  projectId: "fitness4all-c7fa2",
-  storageBucket: "fitness4all-c7fa2.firebasestorage.app",
-  messagingSenderId: "18664929793",
-  appId: "1:18664929793:web:07c33a30f46c0700481e00",
-  measurementId: "G-583J7G0MFY"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Inicializa Firebase
