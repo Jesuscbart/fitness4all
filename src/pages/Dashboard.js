@@ -18,10 +18,12 @@ function Dashboard() {
     weight: ''
   });
   const [weightData, setWeightData] = useState([]);
-  const [weightDate, setWeightDate] = useState('');
+  const [weightDate, setWeightDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [goal, setGoal] = useState('');
   const [submittedGoal, setSubmittedGoal] = useState('');
+  const [updateMessage, setUpdateMessage] = useState('');
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
 
   const calculateBMI = (height, weight) => {
     if (height && weight) {
@@ -78,27 +80,16 @@ function Dashboard() {
   }, [currentUser]);
 
   useEffect(() => {
-    const updateHeightAndWeight = async () => {
-      if (!currentUser) {
-        console.error('Usuario no autenticado');
-        return;
-      }
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      try {
-        await updateDoc(userDocRef, {
-          height: formData.height,
-          weight: formData.weight
-        });
-        console.log('Altura y peso actualizados automáticamente');
-      } catch (error) {
-        console.error('Error al actualizar altura y peso:', error);
-      }
-    };
-
-    if (formData.height || formData.weight) {
-      updateHeightAndWeight();
+    if (userData) {
+      setFormData(prevData => ({
+        ...prevData,
+        age: userData.age || '',
+        height: userData.height || '',
+        weight: userData.weight || ''
+      }));
     }
-  }, [formData.height, formData.weight, currentUser]);
+  }, [userData]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -133,7 +124,7 @@ function Dashboard() {
 
       const updatedUserDoc = await getDoc(userDocRef);
       setUserData(updatedUserDoc.data());
-      alert('Datos actualizados correctamente');
+      setUpdateMessage('Se han actualizado los datos');
       fetchWeightData(); // Actualizar los datos de peso
     } catch (error) {
       console.error('Error al actualizar los datos:', error);
@@ -149,8 +140,13 @@ function Dashboard() {
   };
 
   const handleGoalSubmit = async () => {
+    setIsLoadingAI(true);
     try {
       const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
+      const userAge = userData?.age || 'desconocida';
+      const userHeight = userData?.height || 'desconocida';
+      const userWeight = userData?.weight || 'desconocido';
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -166,6 +162,8 @@ function Dashboard() {
 Eres un asistente virtual con la función de entrenador personal y nutricionista experto.
 Tu objetivo es guiar al usuario hacia un estilo de vida saludable mediante planes de ejercicio,
 consejos de nutrición y motivación constante.
+
+Ten en cuenta que el usuario tien ${userAge} años, mide ${userHeight} cm y pesa ${userWeight} kg.
 
 Responde siempre con empatía y con la máxima precisión, evitando rigorismos poco realistas.
 No hagas diagnósticos médicos ni promesas infundadas. Aporta información útil,
@@ -187,6 +185,8 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
       setSubmittedGoal(data.choices[0].message.content);
     } catch (error) {
       console.error('Error al consultar la IA:', error);
+    } finally {
+      setIsLoadingAI(false);
     }
   };
 
@@ -224,6 +224,7 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
                 <input type="date" id="weightDate" name="weightDate" value={weightDate} onChange={(e) => setWeightDate(e.target.value)} required />
               </div>
               <button type="submit">Guardar Datos</button>
+              {updateMessage && <p>{updateMessage}</p>}
             </form>
           </div>
         </div>
@@ -250,7 +251,18 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
           rows={5}
         />
         <button onClick={handleGoalSubmit}>Enviar</button>
-        {submittedGoal && (
+        {isLoadingAI && (
+          <div className="loading-container">
+            <div className="lds-ring">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+            <p>Cargando la respuesta...</p>
+          </div>
+        )}
+        {submittedGoal && !isLoadingAI && (
           <div className="markdown-preview">
             <ReactMarkdown>{submittedGoal}</ReactMarkdown>
           </div>
