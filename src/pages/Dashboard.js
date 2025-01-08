@@ -114,11 +114,12 @@ function Dashboard() {
     try {
       await updateDoc(userDocRef, updatedData);
 
-      // Registrar el peso en la colección 'measurements'
-      const weightLogRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
-      await setDoc(weightLogRef, {
+      // Registrar el peso y la altura en la colección 'measurements'
+      const measurementLogRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
+      await setDoc(measurementLogRef, {
         timestamp: weightDate ? Timestamp.fromDate(new Date(weightDate)) : Timestamp.now(),
         weight: formData.weight,
+        height: formData.height, // Añadir altura
         // Otros campos de medidas
       });
 
