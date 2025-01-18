@@ -88,6 +88,20 @@
   background-color: #0056b3;
 }
 
+/* Añadir estilos específicos para los mensajes de error dentro del modal */
+.modal .error {
+  color: red;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Añadir estilos específicos para los mensajes de confirmación dentro del modal */
+.modal .success {
+  color: green;
+  font-size: 0.9rem;
+  font-weight: bold; /* Texto en negrita */
+}
+
 .goal-section {
   margin-top: 20px;
 }
@@ -169,4 +183,12 @@
   align-items: center;
   justify-content: center;
   margin-top: 20px;
+}
+
+.error {
+  color: red;
+  font-size: 0.9rem;
+  font-weight: bold; /* Agregado: texto en negrita */
+  margin-top: 5px;
+  text-align: left;
 }

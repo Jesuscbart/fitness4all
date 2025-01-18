@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.error {
+  color: red;
+  font-size: 0.9rem;
+  font-weight: bold; /* Agregado: texto en negrita */
+  margin-top: 5px;
+  text-align: left;
+}
+
+.success {
+  color: green;
+  font-size: 0.9rem;
+  font-weight: bold; /* Texto en negrita */
+  margin-top: 5px;
+  text-align: left;
+}
+
+/* Utilizar Flexbox para centrar el contenido del formulario */
+.complete-profile-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Asegurar que el botón tenga un margen superior */
+.complete-profile-form button {
+  display: block;
+  margin: 20px auto 0 auto; /* Ajusta según sea necesario */
+}
+
+/* Centrar el botón 'Guardar' */
+form button {
+  display: block;
+  margin: 0 auto;
+}

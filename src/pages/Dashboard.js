@@ -17,6 +17,7 @@ function Dashboard() {
     height: '',
     weight: ''
   });
+  const [errors, setErrors] = useState({}); // Agregado: Estado para errores
   const [weightData, setWeightData] = useState([]);
   const [weightDate, setWeightDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -99,8 +100,59 @@ function Dashboard() {
     }));
   };
 
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const newErrors = { ...errors };
+
+    if (name === 'age') {
+      if (value < 10 || value > 120) {
+        newErrors.age = 'La edad debe estar entre 10 y 120 años.';
+      } else {
+        delete newErrors.age;
+      }
+    }
+
+    if (name === 'height') {
+      if (value < 60 || value > 240) {
+        newErrors.height = 'La altura debe estar entre 60 cm y 240 cm.';
+      } else {
+        delete newErrors.height;
+      }
+    }
+
+    if (name === 'weight') {
+      if (value < 20 || value > 650) {
+        newErrors.weight = 'El peso debe estar entre 20 kg y 650 kg.';
+      } else {
+        delete newErrors.weight;
+      }
+    }
+
+    setErrors(newErrors);
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
+
+    // Validaciones
+    const newErrors = {};
+    if (formData.age < 10 || formData.age > 120) {
+      newErrors.age = 'La edad debe estar entre 10 y 120 años.';
+    }
+    if (formData.height < 60 || formData.height > 240) {
+      newErrors.height = 'La altura debe estar entre 60 cm y 240 cm.';
+    }
+    if (formData.weight < 20 || formData.weight > 650) {
+      newErrors.weight = 'El peso debe estar entre 20 kg y 650 kg.';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+
     const userDocRef = doc(db, 'users', currentUser.uid);
     const updatedData = {};
 
@@ -125,7 +177,8 @@ function Dashboard() {
 
       const updatedUserDoc = await getDoc(userDocRef);
       setUserData(updatedUserDoc.data());
-      setUpdateMessage('Se han actualizado los datos');
+      setUpdateMessage('Se han actualizado los datos correctamente');
+      setTimeout(() => setUpdateMessage(''), 3000); // Agregado: Limpiar mensaje después de 3 segundos
       fetchWeightData(); // Actualizar los datos de peso
     } catch (error) {
       console.error('Error al actualizar los datos:', error);
@@ -164,7 +217,7 @@ Eres un asistente virtual con la función de entrenador personal y nutricionista
 Tu objetivo es guiar al usuario hacia un estilo de vida saludable mediante planes de ejercicio,
 consejos de nutrición y motivación constante.
 
-Ten en cuenta que el usuario tien ${userAge} años, mide ${userHeight} cm y pesa ${userWeight} kg.
+Ten en cuenta que el usuario tiene ${userAge} años, mide ${userHeight} cm y pesa ${userWeight} kg.
 
 Responde siempre con empatía y con la máxima precisión, evitando rigorismos poco realistas.
 No hagas diagnósticos médicos ni promesas infundadas. Aporta información útil,
@@ -183,13 +236,34 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
       });
       const data = await response.json();
       console.log(data); // Ver el objeto recibido
-      setSubmittedGoal(data.choices[0].message.content);
+      const aiResponse = data.choices[0].message.content;
+      setSubmittedGoal(aiResponse);
+
+      // Guardar submittedGoal en Firestore
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userDocRef, {
+        submittedGoal: aiResponse
+      });
     } catch (error) {
       console.error('Error al consultar la IA:', error);
     } finally {
       setIsLoadingAI(false);
     }
   };
+
+  useEffect(() => {
+    const fetchSubmittedGoal = async () => {
+      if (currentUser) {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setSubmittedGoal(userDoc.data().submittedGoal || '');
+        }
+      }
+    };
+
+    fetchSubmittedGoal();
+  }, [currentUser]);
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -206,26 +280,56 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
         <div className="modal-overlay">
           <div className="modal">
             <button className="close-button" onClick={handleCloseModal}>X</button>
-            <form onSubmit={handleUpdate}>
+            <form onSubmit={handleUpdate} noValidate> {/* Agregado: noValidate */}
               {/* Eliminar el campo "nombre" */}
               <div>
                 <label htmlFor="age">Edad:</label>
-                <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} />
+                <input
+                  type="number"
+                  id="age"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleChange}
+                  onBlur={handleBlur} // Agregado
+                  min="10"      // Agregado: Atributo min
+                  max="120"     // Agregado: Atributo max
+                />
+                {errors.age && <p className="error">{errors.age}</p>} {/* Agregado: Mensaje de error */}
               </div>
               <div>
                 <label htmlFor="height">Altura (cm):</label>
-                <input type="number" id="height" name="height" value={formData.height} onChange={handleChange} />
+                <input
+                  type="number"
+                  id="height"
+                  name="height"
+                  value={formData.height}
+                  onChange={handleChange}
+                  onBlur={handleBlur} // Agregado
+                  min="60"      // Agregado: Atributo min
+                  max="240"     // Agregado: Atributo max
+                />
+                {errors.height && <p className="error">{errors.height}</p>} {/* Agregado: Mensaje de error */}
               </div>
               <div>
                 <label htmlFor="weight">Peso (kg):</label>
-                <input type="number" id="weight" name="weight" value={formData.weight} onChange={handleChange} />
+                <input
+                  type="number"
+                  id="weight"
+                  name="weight"
+                  value={formData.weight}
+                  onChange={handleChange}
+                  onBlur={handleBlur} // Agregado
+                  min="20"      // Agregado: Atributo min
+                  max="650"     // Agregado: Atributo max
+                />
+                {errors.weight && <p className="error">{errors.weight}</p>} {/* Agregado: Mensaje de error */}
               </div>
               <div>
                 <label htmlFor="weightDate">Fecha del Peso:</label>
-                <input type="date" id="weightDate" name="weightDate" value={weightDate} onChange={(e) => setWeightDate(e.target.value)} required />
+                <input type="date" id="weightDate" name="weightDate" value={weightDate} onChange={(e) => setWeightDate(e.target.value)} />
               </div>
               <button type="submit">Guardar Datos</button>
-              {updateMessage && <p>{updateMessage}</p>}
+              {updateMessage && <p className="success">{updateMessage}</p>} {/* Modificado: Clase 'success' */}
             </form>
           </div>
         </div>
