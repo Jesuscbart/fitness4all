@@ -243,6 +243,7 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
       const userDocRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userDocRef, {
         submittedGoal: aiResponse
+        // lastProcessedGoal se actualizará en ExerciseLog.js
       });
     } catch (error) {
       console.error('Error al consultar la IA:', error);
@@ -264,6 +265,13 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
 
     fetchSubmittedGoal();
   }, [currentUser]);
+
+  useEffect(() => {
+    if (submittedGoal) {
+      // handleGeneratePlan(submittedGoal); // Removido si no está definido
+      // Puedes mover esta lógica a ExerciseLog.js si corresponde
+    }
+  }, [submittedGoal]);
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -378,3 +386,4 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
 }
 
 export default Dashboard;
+

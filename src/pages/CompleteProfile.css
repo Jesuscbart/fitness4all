@@ -15,7 +15,7 @@ code {
 .error {
   color: red;
   font-size: 0.9rem;
-  font-weight: bold; /* Agregado: texto en negrita */
+  font-weight: bold; 
   margin-top: 5px;
   text-align: left;
 }
@@ -23,27 +23,21 @@ code {
 .success {
   color: green;
   font-size: 0.9rem;
-  font-weight: bold; /* Texto en negrita */
+  font-weight: bold; 
   margin-top: 5px;
   text-align: left;
 }
 
-/* Utilizar Flexbox para centrar el contenido del formulario */
 .complete-profile-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: stretch; 
+  text-align: center; 
 }
 
-/* Asegurar que el botón tenga un margen superior */
 .complete-profile-form button {
   display: block;
-  margin: 20px auto 0 auto; /* Ajusta según sea necesario */
-}
-
-/* Centrar el botón 'Guardar' */
-form button {
-  display: block;
-  margin: 0 auto;
+  align-self: center; 
+  margin: 20px 0 0 0; 
+  width: auto; 
 }

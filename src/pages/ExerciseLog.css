@@ -1,0 +1,199 @@
+.dashboard {
+  padding: 20px;
+  text-align: center; /* Centrar el contenido */
+}
+
+.dashboard h1 {
+  color: #007bff;
+}
+
+.dashboard button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+
+.dashboard button:hover {
+  background-color: #0056b3;
+}
+
+.dashboard p {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 10px 0;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: #fff;
+  margin: 100px auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  border-radius: 8px;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal form div {
+  margin-bottom: 15px;
+}
+
+.modal form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.modal form input, .modal form select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.modal form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.modal form button:hover {
+  background-color: #0056b3;
+}
+
+/* Añadir estilos específicos para los mensajes de error dentro del modal */
+.modal .error {
+  color: red;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Añadir estilos específicos para los mensajes de confirmación dentro del modal */
+.modal .success {
+  color: green;
+  font-size: 0.9rem;
+  font-weight: bold; /* Texto en negrita */
+}
+
+.goal-section {
+  margin-top: 20px;
+}
+
+.goal-section p {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.goal-section input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.goal-section textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.markdown-preview {
+  margin-top: 20px;
+  text-align: left;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 51px;
+  height: 51px;
+  margin: 6px;
+  border: 6px solid #007bff;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #007bff transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.error {
+  color: red;
+  font-size: 0.9rem;
+  font-weight: bold; /* Agregado: texto en negrita */
+  margin-top: 5px;
+  text-align: left;
+}
+
+.exercise-plan {
+  max-width: 1000px; /* Aumenta el ancho del contenido */
+  margin: 20px auto; /* Centra el contenido horizontalmente */
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}

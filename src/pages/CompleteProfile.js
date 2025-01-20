@@ -152,7 +152,6 @@ function CompleteProfile() {
         />
         {errors.weight && <p className="error">{errors.weight}</p>} {/* Agregado: Mensaje de error */}
       </div>
-      {/* Otros campos */}
       <button type="submit">Guardar</button>
       {updateMessage && <p className="success">{updateMessage}</p>} {/* Modificado: Clase 'success' */}
     </form>

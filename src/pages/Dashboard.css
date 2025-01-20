@@ -128,10 +128,14 @@
   border-radius: 5px;
   font-size: 1rem;
   resize: vertical;
+  max-width: 1000px; /* Igualar el ancho al de ExerciseLog */
+  margin: 10px auto;
+  display: block;
 }
 
 .markdown-preview {
-  margin-top: 20px;
+  max-width: 1000px; /* Igualar el ancho al de ExerciseLog */
+  margin: 20px auto;
   text-align: left;
   background-color: #fff;
   padding: 10px;
@@ -191,4 +195,12 @@
   font-weight: bold; /* Agregado: texto en negrita */
   margin-top: 5px;
   text-align: left;
+}
+
+.exercise-plan {
+  max-width: 600px; /* Limita el ancho del contenido */
+  margin: 20px auto; /* Centra el contenido horizontalmente */
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
 }
