@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Fitness4All",
+  "name": "Fitness4All",
+  "description": "Una aplicación para seguimiento de fitness y nutrición",
   "icons": [
     {
       "src": "favicon.ico",

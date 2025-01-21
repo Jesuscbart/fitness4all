@@ -343,14 +343,12 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
         </div>
       )}
 
-      {/* Mostrar datos del usuario */}
       {userData && (
         <div>
-          <p>Edad: {userData.age}</p>
-          <p>Altura: {userData.height} cm</p>
-          <p>Peso: {userData.weight} kg</p>
-          <p>IMC: {calculateBMI(userData.height, userData.weight)}</p>
-          {/* Otros datos que desees mostrar */}
+          <p><strong>Edad: </strong>{userData.age}</p>
+          <p><strong>Altura: </strong>{userData.height} cm</p>
+          <p><strong>Peso: </strong>{userData.weight} kg</p>
+          <p><strong>IMC: </strong>{calculateBMI(userData.height, userData.weight)}</p>
         </div>
       )}
 

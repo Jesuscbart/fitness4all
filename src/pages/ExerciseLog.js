@@ -12,6 +12,11 @@ function ExerciseLog() {
   const [submittedGoal, setSubmittedGoal] = useState(''); // Asegurado
   const [lastProcessedGoal, setLastProcessedGoal] = useState(''); // Añadido
 
+  // Añadir estados para userAge, userHeight y userWeight
+  const [userAge, setUserAge] = useState('');
+  const [userHeight, setUserHeight] = useState('');
+  const [userWeight, setUserWeight] = useState('');
+
   useEffect(() => {
     if (!currentUser) return;
     (async () => {
@@ -28,6 +33,11 @@ function ExerciseLog() {
           if (data.lastProcessedGoal) {
             setLastProcessedGoal(data.lastProcessedGoal); // Establecer el último objetivo procesado
           }
+          
+          // Asignar valores a userAge, userHeight y userWeight
+          setUserAge(data.age);
+          setUserHeight(data.height);
+          setUserWeight(data.weight);
         }
       } catch (error) {
         console.error('Error al obtener los datos:', error);
@@ -54,14 +64,52 @@ function ExerciseLog() {
           'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}` 
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
               content: `
-Eres un entrenador personal. Basándote en el siguiente objetivo:
-"${goal}"
-Elabora un programa de ejercicios semanal en Markdown que permita al usuario cumplir con esos objetivos. Explica cada ejercicio brevemente.
+Eres un entrenador personal altamente calificado con experiencia en la creación de programas de ejercicio personalizados. Tu objetivo es ayudar al usuario a alcanzar sus metas de fitness proporcionando un plan de ejercicios semanal detallado y efectivo.
+
+**Información del Usuario:**
+- **Edad:** ${userAge} años
+- **Altura:** ${userHeight} cm
+- **Peso:** ${userWeight} kg
+- **Objetivo:** ${goal}
+
+**Instrucciones:**
+- Elabora un programa de ejercicios semanal en formato Markdown.
+- Divide el plan en días de la semana (Lunes a Domingo).
+- Para cada día, incluye:
+  - **Tipo de ejercicio** (por ejemplo, cardio, fuerza, flexibilidad).
+  - **Descripción detallada** de cada ejercicio.
+  - **Número de series y repeticiones** o duración.
+  - **Consejos** para una ejecución correcta.
+- Incluye un **calentamiento** y **estiramiento** diario.
+- Asegúrate de que el programa sea equilibrado, variado y adecuado para el nivel de experiencia del usuario.
+- Utiliza listas, encabezados y formatos claros para facilitar la lectura.
+
+**Ejemplo de Formato:**
+## Lunes: Entrenamiento de Fuerza
+
+### Calentamiento
+- 5 minutos de saltos de tijera
+- 5 minutos de estiramientos dinámicos
+
+### Ejercicio 1: Sentadillas
+- **Series:** 3
+- **Repeticiones:** 12
+- **Descripción:** Mantén la espalda recta y baja hasta que tus muslos estén paralelos al suelo.
+- **Consejo:** No dejes que tus rodillas sobrepasen los dedos de los pies.
+
+### Ejercicio 2: Flexiones
+- **Series:** 3
+- **Repeticiones:** 10
+- **Descripción:** Mantén el cuerpo recto y baja hasta que el pecho casi toque el suelo.
+- **Consejo:** No arquees la espalda durante el ejercicio.
+
+### Estiramiento
+- 5 minutos de estiramientos estáticos enfocándose en piernas y brazos.
 `
             }
           ]
@@ -84,7 +132,7 @@ Elabora un programa de ejercicios semanal en Markdown que permita al usuario cum
   };
 
   return (
-    <div>
+    <div className="exercise-log"> {/* Añadido para aplicar los estilos */}
       <h1>Registro de Ejercicios</h1>
       {isLoading && (
         <div className="loading-container">
@@ -94,7 +142,7 @@ Elabora un programa de ejercicios semanal en Markdown que permita al usuario cum
             <div></div>
             <div></div>
           </div>
-          <p>Cargando la respuesta...</p>
+          <p>Creando tu plan de ejercicios personalizado...</p>
         </div>
       )}
       {exercisePlan && (
@@ -107,4 +155,3 @@ Elabora un programa de ejercicios semanal en Markdown que permita al usuario cum
 }
 
 export default ExerciseLog;
-

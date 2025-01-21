@@ -130,10 +130,9 @@ function CompleteProfile() {
           placeholder="Altura (cm)"
           value={height}
           onChange={(e) => setHeight(e.target.value)}
-          onBlur={handleBlur} // Agregado
-          min="60"      // Agregado: Atributo min
-          max="240"     // Agregado: Atributo max
-          /* Removed: required */
+          onBlur={handleBlur} 
+          min="60"      
+          max="240"    
         />
         {errors.height && <p className="error">{errors.height}</p>} {/* Agregado: Mensaje de error */}
       </div>
