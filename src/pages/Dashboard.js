@@ -17,7 +17,7 @@ function Dashboard() {
     height: '',
     weight: ''
   });
-  const [errors, setErrors] = useState({}); // Agregado: Estado para errores
+  const [errors, setErrors] = useState({}); // Almacena los errores de validación
   const [weightData, setWeightData] = useState([]);
   const [weightDate, setWeightDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +26,7 @@ function Dashboard() {
   const [updateMessage, setUpdateMessage] = useState('');
   const [isLoadingAI, setIsLoadingAI] = useState(false);
 
+  // Calcula el IMC a partir de la altura y el peso
   const calculateBMI = (height, weight) => {
     if (height && weight) {
       const heightInMeters = height / 100;
@@ -34,6 +35,7 @@ function Dashboard() {
     return null;
   };
 
+  // Obtiene los datos del usuario desde Firestore
   useEffect(() => {
     const fetchUserData = async () => {
       if (!currentUser) {
@@ -46,7 +48,7 @@ function Dashboard() {
       if (userDoc.exists()) {
         setUserData(userDoc.data());
       } else {
-        console.log('No se encontró el usuario en Firestore');
+        console.log('Usuario no encontrado en Firestore');
       }
       setLoading(false);
     };
@@ -56,6 +58,7 @@ function Dashboard() {
     }
   }, [currentUser]);
 
+  // Obtiene el historial de peso del usuario
   const fetchWeightData = async () => {
     if (!currentUser) {
       console.error('Usuario no autenticado');
@@ -68,9 +71,8 @@ function Dashboard() {
       weight: doc.data().weight
     }));
 
-    // Ordenar los datos por fecha ascendente
+    // Ordena los datos por fecha en orden ascendente
     weights.sort((a, b) => a.date - b.date);
-
     setWeightData(weights);
   };
 
@@ -80,6 +82,7 @@ function Dashboard() {
     }
   }, [currentUser]);
 
+  // Inicializa el formulario con los datos del usuario
   useEffect(() => {
     if (userData) {
       setFormData(prevData => ({
@@ -91,7 +94,6 @@ function Dashboard() {
     }
   }, [userData]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -100,6 +102,7 @@ function Dashboard() {
     }));
   };
 
+  // Valida los valores cuando se pierde el foco en un campo
   const handleBlur = (e) => {
     const { name, value } = e.target;
     const newErrors = { ...errors };
@@ -131,10 +134,11 @@ function Dashboard() {
     setErrors(newErrors);
   };
 
+  // Actualiza los datos del usuario y registra la medida en Firestore
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // Validaciones
+    // Validación de datos introducidos
     const newErrors = {};
     if (formData.age < 10 || formData.age > 120) {
       newErrors.age = 'La edad debe estar entre 10 y 120 años.';
@@ -152,11 +156,10 @@ function Dashboard() {
     }
 
     setErrors({});
-
     const userDocRef = doc(db, 'users', currentUser.uid);
     const updatedData = {};
 
-    // Solo actualizar los campos que no están vacíos
+    // Actualiza solo los campos que tengan valor
     for (const key in formData) {
       if (formData[key]) {
         updatedData[key] = formData[key];
@@ -166,20 +169,19 @@ function Dashboard() {
     try {
       await updateDoc(userDocRef, updatedData);
 
-      // Registrar el peso y la altura en la colección 'measurements'
+      // Registra la medida en la colección "measurements"
       const measurementLogRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
       await setDoc(measurementLogRef, {
         timestamp: weightDate ? Timestamp.fromDate(new Date(weightDate)) : Timestamp.now(),
         weight: formData.weight,
-        height: formData.height, // Añadir altura
-        // Otros campos de medidas
+        height: formData.height
       });
 
       const updatedUserDoc = await getDoc(userDocRef);
       setUserData(updatedUserDoc.data());
       setUpdateMessage('Se han actualizado los datos correctamente');
-      setTimeout(() => setUpdateMessage(''), 3000); // Agregado: Limpiar mensaje después de 3 segundos
-      fetchWeightData(); // Actualizar los datos de peso
+      setTimeout(() => setUpdateMessage(''), 3000);
+      fetchWeightData(); // Actualiza el historial de peso
     } catch (error) {
       console.error('Error al actualizar los datos:', error);
     }
@@ -193,6 +195,7 @@ function Dashboard() {
     setIsModalOpen(false);
   };
 
+  // Envía la consulta a la IA para generar un plan basado en el objetivo del usuario
   const handleGoalSubmit = async () => {
     setIsLoadingAI(true);
     try {
@@ -235,7 +238,6 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
         })
       });
       const data = await response.json();
-      console.log(data); // Ver el objeto recibido
       const aiResponse = data.choices[0].message.content;
       setSubmittedGoal(aiResponse);
 
@@ -243,7 +245,6 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
       const userDocRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userDocRef, {
         submittedGoal: aiResponse
-        // lastProcessedGoal se actualizará en ExerciseLog.js
       });
     } catch (error) {
       console.error('Error al consultar la IA:', error);
@@ -252,6 +253,7 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
     }
   };
 
+  // Obtiene la respuesta previamente registrada de la IA
   useEffect(() => {
     const fetchSubmittedGoal = async () => {
       if (currentUser) {
@@ -266,12 +268,6 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
     fetchSubmittedGoal();
   }, [currentUser]);
 
-  useEffect(() => {
-    if (submittedGoal) {
-      // handleGeneratePlan(submittedGoal); // Removido si no está definido
-      // Puedes mover esta lógica a ExerciseLog.js si corresponde
-    }
-  }, [submittedGoal]);
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -280,16 +276,13 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
   return (
     <div className="dashboard">
       <h1>Bienvenido, {userData?.name}</h1>
-      {/* Botón para abrir el modal */}
       <button onClick={handleOpenModal}>Introducir Datos</button>
 
-      {/* Mostrar el modal si isModalOpen es true */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
             <button className="close-button" onClick={handleCloseModal}>X</button>
-            <form onSubmit={handleUpdate} noValidate> {/* Agregado: noValidate */}
-              {/* Eliminar el campo "nombre" */}
+            <form onSubmit={handleUpdate} noValidate>
               <div>
                 <label htmlFor="age">Edad:</label>
                 <input
@@ -298,11 +291,11 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
                   name="age"
                   value={formData.age}
                   onChange={handleChange}
-                  onBlur={handleBlur} // Agregado
-                  min="10"      // Agregado: Atributo min
-                  max="120"     // Agregado: Atributo max
+                  onBlur={handleBlur}
+                  min="10"
+                  max="120"
                 />
-                {errors.age && <p className="error">{errors.age}</p>} {/* Agregado: Mensaje de error */}
+                {errors.age && <p className="error">{errors.age}</p>}
               </div>
               <div>
                 <label htmlFor="height">Altura (cm):</label>
@@ -312,11 +305,11 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
                   name="height"
                   value={formData.height}
                   onChange={handleChange}
-                  onBlur={handleBlur} // Agregado
-                  min="60"      // Agregado: Atributo min
-                  max="240"     // Agregado: Atributo max
+                  onBlur={handleBlur}
+                  min="60"
+                  max="240"
                 />
-                {errors.height && <p className="error">{errors.height}</p>} {/* Agregado: Mensaje de error */}
+                {errors.height && <p className="error">{errors.height}</p>}
               </div>
               <div>
                 <label htmlFor="weight">Peso (kg):</label>
@@ -326,18 +319,18 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
                   name="weight"
                   value={formData.weight}
                   onChange={handleChange}
-                  onBlur={handleBlur} // Agregado
-                  min="20"      // Agregado: Atributo min
-                  max="650"     // Agregado: Atributo max
+                  onBlur={handleBlur}
+                  min="20"
+                  max="650"
                 />
-                {errors.weight && <p className="error">{errors.weight}</p>} {/* Agregado: Mensaje de error */}
+                {errors.weight && <p className="error">{errors.weight}</p>}
               </div>
               <div>
                 <label htmlFor="weightDate">Fecha del Peso:</label>
                 <input type="date" id="weightDate" name="weightDate" value={weightDate} onChange={(e) => setWeightDate(e.target.value)} />
               </div>
               <button type="submit">Guardar Datos</button>
-              {updateMessage && <p className="success">{updateMessage}</p>} {/* Modificado: Clase 'success' */}
+              {updateMessage && <p className="success">{updateMessage}</p>}
             </form>
           </div>
         </div>
@@ -352,7 +345,6 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
         </div>
       )}
 
-      {/* Sección para introducir objetivos */}
       <div className="goal-section">
         <p>Cuéntame cuáles son tus objetivos:</p>
         <textarea
@@ -384,4 +376,3 @@ Concéntrate en resolver las dudas del usuario según tu rol de entrenador y nut
 }
 
 export default Dashboard;
-

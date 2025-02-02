@@ -20,18 +20,17 @@ function Login() {
         const userDoc = await getDoc(userDocRef);
 
         if (!userDoc.exists()) {
-          // Si el usuario no existe, guárdalo en Firestore
+          // Si el usuario no existe, se guarda en Firestore
           await setDoc(userDocRef, {
             name: user.displayName,
             email: user.email,
-            photoURL: user.photoURL,
-            // Otros datos que quieras almacenar
+            photoURL: user.photoURL
           });
-          // Redirige a completar perfil
+          // Si es un nuevo usuario, dirigir a completar el perfil
           navigate('/complete-profile');
           console.log('Usuario guardado en Firestore');
         } else {
-          // Usuario ya existe, redirige al Dashboard
+          // Si el usuario ya existe, dirigir al Dashboard
           navigate('/');
           console.log('Usuario ya existe en Firestore');
         }

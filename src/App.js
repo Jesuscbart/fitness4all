@@ -12,6 +12,7 @@ import ExerciseLog from './pages/ExerciseLog';
 import History from './pages/History';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend } from 'chart.js';
 
+// Configuración del chart (se utiliza en los gráficos de la aplicación)
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
-          {/* Rutas públicas */}
+          {/* Rutas de acceso público */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/complete-profile" element={
@@ -29,7 +30,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/* Rutas protegidas */}
+          {/* Rutas protegidas para usuarios autenticados */}
           <Route path="/" element={
               <PrivateRoute>
                 <Dashboard />
@@ -54,7 +55,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          {/* Otras rutas protegidas */}
         </Routes>
       </Router>
     </AuthProvider>

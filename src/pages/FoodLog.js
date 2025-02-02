@@ -12,7 +12,7 @@ function FoodLog() {
   const [submittedGoal, setSubmittedGoal] = useState('');
   const [lastProcessedGoal, setLastProcessedGoal] = useState('');
   
-  // Añadir estados para userAge, userHeight y userWeight
+  // Estados para almacenar los datos del usuario
   const [userAge, setUserAge] = useState('');
   const [userHeight, setUserHeight] = useState('');
   const [userWeight, setUserWeight] = useState('');

@@ -1,6 +1,6 @@
 .dashboard {
   padding: 20px;
-  text-align: center; /* Centrar el contenido */
+  text-align: center;
 }
 
 .dashboard h1 {
@@ -88,18 +88,16 @@
   background-color: #0056b3;
 }
 
-/* Añadir estilos específicos para los mensajes de error dentro del modal */
 .modal .error {
   color: red;
   font-size: 0.9rem;
   font-weight: bold;
 }
 
-/* Añadir estilos específicos para los mensajes de confirmación dentro del modal */
 .modal .success {
   color: green;
   font-size: 0.9rem;
-  font-weight: bold; /* Texto en negrita */
+  font-weight: bold;
 }
 
 .goal-section {
@@ -128,13 +126,13 @@
   border-radius: 5px;
   font-size: 1rem;
   resize: vertical;
-  max-width: 1000px; /* Igualar el ancho al de ExerciseLog */
+  max-width: 1000px; 
   margin: 10px auto;
   display: block;
 }
 
 .markdown-preview {
-  max-width: 1000px; /* Igualar el ancho al de ExerciseLog */
+  max-width: 1000px; 
   margin: 20px auto;
   text-align: left;
   background-color: #fff;
@@ -144,8 +142,8 @@
 
 .lds-ring {
   color: #007bff;
-  width: 40px; /* Cambiar tamaño */
-  height: 40px; /* Cambiar tamaño */
+  width: 40px; 
+  height: 40px; 
 }
 .lds-ring,
 .lds-ring div {
@@ -155,9 +153,9 @@
   box-sizing: border-box;
   display: block;
   position: absolute;
-  width: 32px; /* Cambiar tamaño */
-  height: 32px; /* Cambiar tamaño */
-  margin: 4px; /* Cambiar tamaño */
+  width: 32px; 
+  height: 32px; 
+  margin: 4px; 
   border: 8px solid currentColor;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
@@ -192,14 +190,14 @@
 .error {
   color: red;
   font-size: 0.9rem;
-  font-weight: bold; /* Agregado: texto en negrita */
+  font-weight: bold; 
   margin-top: 5px;
   text-align: left;
 }
 
 .exercise-plan {
-  max-width: 600px; /* Limita el ancho del contenido */
-  margin: 20px auto; /* Centra el contenido horizontalmente */
+  max-width: 600px; 
+  margin: 20px auto; 
   padding: 10px;
   background-color: #f9f9f9;
   border-radius: 8px;

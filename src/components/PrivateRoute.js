@@ -7,7 +7,7 @@ const PrivateRoute = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
 
   if (currentUser === null) {
-    // Puedes mostrar un spinner o mensaje de carga si lo deseas
+    // Redirige al login si el usuario no está autenticado
     return <Navigate to="/login" />;
   }
 

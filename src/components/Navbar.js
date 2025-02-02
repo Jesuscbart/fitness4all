@@ -11,7 +11,7 @@ function Navbar() {
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
-        console.log('Usuario ha cerrado sesión');
+        console.log('El usuario ha cerrado sesión');
       })
       .catch((error) => {
         console.error('Error al cerrar sesión:', error);

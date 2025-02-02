@@ -16,16 +16,14 @@ function SignUp() {
         const user = userCredential.user;
         // Guarda el usuario en Firestore
         await setDoc(doc(db, 'users', user.uid), {
-          name: '', // Puedes pedir el nombre en el formulario de registro si lo deseas
-          email: user.email,
-          // Otros datos que quieras almacenar
+          name: '',
+          email: user.email
         });
-        // Redirige a completar perfil
+        // Navega a la página para completar el perfil
         navigate('/complete-profile');
         console.log('Usuario registrado:', user);
       })
       .catch((error) => {
-        // Manejo de errores
         console.error('Error en el registro:', error);
       });
   };

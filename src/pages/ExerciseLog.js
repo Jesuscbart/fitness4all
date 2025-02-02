@@ -9,10 +9,10 @@ function ExerciseLog() {
   const { currentUser } = useContext(AuthContext);
   const [exercisePlan, setExercisePlan] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [submittedGoal, setSubmittedGoal] = useState(''); // Asegurado
-  const [lastProcessedGoal, setLastProcessedGoal] = useState(''); // Añadido
+  const [submittedGoal, setSubmittedGoal] = useState('');
+  const [lastProcessedGoal, setLastProcessedGoal] = useState('');
 
-  // Añadir estados para userAge, userHeight y userWeight
+  // Estados para almacenar los datos del usuario
   const [userAge, setUserAge] = useState('');
   const [userHeight, setUserHeight] = useState('');
   const [userWeight, setUserWeight] = useState('');
@@ -24,17 +24,14 @@ function ExerciseLog() {
         const userDocRef = doc(db, 'users', currentUser.uid);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
-          // Cargar plan guardado para conservarlo al recargar
           const data = userDoc.data();
           if (data.exercisePlan) setExercisePlan(data.exercisePlan);
           if (data.submittedGoal) {
-            setSubmittedGoal(data.submittedGoal); // Establecer el estado correctamente
+            setSubmittedGoal(data.submittedGoal);
           }
           if (data.lastProcessedGoal) {
-            setLastProcessedGoal(data.lastProcessedGoal); // Establecer el último objetivo procesado
+            setLastProcessedGoal(data.lastProcessedGoal);
           }
-          
-          // Asignar valores a userAge, userHeight y userWeight
           setUserAge(data.age);
           setUserHeight(data.height);
           setUserWeight(data.weight);
@@ -49,14 +46,13 @@ function ExerciseLog() {
     if (submittedGoal && submittedGoal !== lastProcessedGoal) {
       handleGeneratePlan(submittedGoal);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submittedGoal]);
 
-  const handleGeneratePlan = async (goal) => { // Recibe el objetivo como parámetro
+  // Llama a la IA para generar un programa de ejercicios personalizado
+  const handleGeneratePlan = async (goal) => {
     setIsLoading(true);
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
-      // Llamada a la IA para generar plan en base a submittedGoal
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 
@@ -132,7 +128,7 @@ Eres un entrenador personal altamente calificado con experiencia en la creación
   };
 
   return (
-    <div className="exercise-log"> {/* Añadido para aplicar los estilos */}
+    <div className="exercise-log">
       <h1>Registro de Ejercicios</h1>
       {isLoading && (
         <div className="loading-container">

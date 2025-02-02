@@ -11,8 +11,7 @@ function CompleteProfile() {
   const [weight, setWeight] = useState('');
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
-  const [updateMessage, setUpdateMessage] = useState(''); // Agregado
-  // Otros campos según tus necesidades
+  const [updateMessage, setUpdateMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +20,7 @@ function CompleteProfile() {
     }
   }, [currentUser]);
 
-  // Añadir una función manejadora para onBlur
+  // Maneja la validación al perder el foco en un campo
   const handleBlur = (e) => {
     const { name, value } = e.target;
     const newErrors = { ...errors };
@@ -53,10 +52,11 @@ function CompleteProfile() {
     setErrors(newErrors);
   };
 
+  // Envía el formulario y actualiza los datos del usuario en Firestore
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validaciones
+    // Validación de campos
     const newErrors = {};
     if (age < 10 || age > 120) {
       newErrors.age = 'La edad debe estar entre 10 y 120 años.';
@@ -80,21 +80,19 @@ function CompleteProfile() {
       await updateDoc(userDocRef, {
         age,
         height,
-        weight,
-        // Otros campos
+        weight
       });
 
       const measurementDocRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
       await setDoc(measurementDocRef, {
         timestamp: Timestamp.now(),
         weight,
-        height,
-        // Otros campos de medidas
+        height
       });
 
       console.log('Perfil actualizado');
-      setUpdateMessage('Perfil actualizado con éxito'); // Agregado
-      navigate('/'); // Redirige al Dashboard u otra página
+      setUpdateMessage('Perfil actualizado con éxito');
+      navigate('/');
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
     }
@@ -105,54 +103,52 @@ function CompleteProfile() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="complete-profile-form"> {/* Agregado: className */}
+    <form onSubmit={handleSubmit} noValidate className="complete-profile-form">
       <h2>Completa tu perfil</h2>
       <div>
-        <label htmlFor="age">Edad:</label> {/* Agregado: Etiqueta para Edad */}
+        <label htmlFor="age">Edad:</label>
         <input
           type="number"
           name="age"
           placeholder="Edad"
           value={age}
           onChange={(e) => setAge(e.target.value)}
-          onBlur={handleBlur} // Agregado
-          min="10"      // Agregado: Atributo min
-          max="120"     // Agregado: Atributo max
-          /* Removed: required */
+          onBlur={handleBlur}
+          min="10"
+          max="120"
         />
-        {errors.age && <p className="error">{errors.age}</p>} {/* Agregado: Mensaje de error */}
+        {errors.age && <p className="error">{errors.age}</p>}
       </div>
       <div>
-        <label htmlFor="height">Altura (cm):</label> {/* Agregado: Etiqueta para Altura */}
+        <label htmlFor="height">Altura (cm):</label>
         <input
           type="number"
           name="height"
           placeholder="Altura (cm)"
           value={height}
           onChange={(e) => setHeight(e.target.value)}
-          onBlur={handleBlur} 
-          min="60"      
-          max="240"    
+          onBlur={handleBlur}
+          min="60"
+          max="240"
         />
-        {errors.height && <p className="error">{errors.height}</p>} {/* Agregado: Mensaje de error */}
+        {errors.height && <p className="error">{errors.height}</p>}
       </div>
       <div>
-        <label htmlFor="weight">Peso (kg):</label> {/* Agregado: Etiqueta para Peso */}
+        <label htmlFor="weight">Peso (kg):</label>
         <input
           type="number"
           name="weight"
           placeholder="Peso (kg)"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          onBlur={handleBlur} // Agregado
-          min="20"      // Agregado: Atributo min
-          max="650"     // Agregado: Atributo max
-          /* Removed: required */
+          onBlur={handleBlur}
+          min="20"
+          max="650"
         />
-        {errors.weight && <p className="error">{errors.weight}</p>} {/* Agregado: Mensaje de error */}
+        {errors.weight && <p className="error">{errors.weight}</p>}
       </div>
       <button type="submit">Guardar</button>
-      {updateMessage && <p className="success">{updateMessage}</p>} {/* Modificado: Clase 'success' */}
+      {updateMessage && <p className="success">{updateMessage}</p>}
     </form>
   );
 }

@@ -115,7 +115,7 @@ function History() {
       <h2>Historial de Altura</h2>
       {heightData.length > 0 ? (
         <div className="chart-container">
-          <Line options={chartOptions} data={heightChartData} /> {/* Asegurar que es Line */}
+          <Line options={chartOptions} data={heightChartData} />
         </div>
       ) : (
         <p>No hay datos de altura disponibles.</p>
