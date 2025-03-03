@@ -138,7 +138,7 @@ function Dashboard() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // Validación de datos introducidos
+    // Validación de los datos introducidos
     const newErrors = {};
     if (formData.age < 10 || formData.age > 120) {
       newErrors.age = 'La edad debe estar entre 10 y 120 años.';
