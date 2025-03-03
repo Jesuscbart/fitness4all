@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute';
 import CompleteProfile from './pages/CompleteProfile';
 import ExerciseLog from './pages/ExerciseLog';
 import History from './pages/History';
+import MealPlanner from './pages/MealPlanner';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend } from 'chart.js';
 
 // Configuración del chart (se utiliza en los gráficos de la aplicación)
@@ -52,6 +53,12 @@ function App() {
           <Route path="/history" element={
               <PrivateRoute>
                 <History />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/meal-planner" element={
+              <PrivateRoute>
+                <MealPlanner />
               </PrivateRoute>
             }
           />
