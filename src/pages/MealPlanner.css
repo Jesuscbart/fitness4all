@@ -1,7 +1,7 @@
 .meal-planner {
-  max-width: 1200px;
+  max-width: 95%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 15px;
 }
 
 .calendar-controls {
@@ -38,9 +38,18 @@
   background-color: #fff;
 }
 
-.calendar-header {
+.calendar-header,
+.calendar-body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+}
+
+.calendar-header .calendar-cell.day-name {
+  min-height: 20px;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
   background-color: #007bff;
   color: white;
 }
@@ -52,8 +61,6 @@
 }
 
 .calendar-body {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
   grid-auto-rows: minmax(180px, auto);
 }
 
@@ -62,6 +69,7 @@
   padding: 10px;
   min-height: 180px;
   position: relative;
+  overflow: hidden;
 }
 
 .calendar-cell.empty {
@@ -221,22 +229,89 @@
 }
 
 /* Estilos responsivos */
+@media (max-width: 1200px) {
+  .meal-title {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .calendar-cell {
+    padding: 8px;
+    min-height: 150px;
+  }
+  
+  .meal-section {
+    padding: 3px 0;
+  }
+}
+
 @media (max-width: 768px) {
+  .meal-planner {
+    padding: 10px 5px;
+  }
+  
+  .calendar {
+    overflow-x: auto;
+  }
+  
+  /* Configuración para activar scroll horizontal */
+  .calendar-header,
   .calendar-body {
-    grid-auto-rows: minmax(150px, auto);
+    min-width: 768px;
   }
   
   .calendar-cell {
-    min-height: 150px;
-    padding: 5px;
+    min-height: 120px;
   }
   
-  .meal-icon {
-    font-size: 1.2rem;
+  .meal-title {
+    font-size: 0.75rem;
+  }
+}
+
+/* Estilos adicionales para pantallas muy pequeñas */
+@media (max-width: 576px) {
+  .calendar-header,
+  .calendar-body {
+    min-width: 700px; /* Ancho mínimo antes de activar scroll */
   }
   
-  .modal-content {
-    width: 95%;
-    padding: 15px;
+  .calendar-controls {
+    flex-direction: column;
+    gap: 8px;
   }
+  
+  .calendar-controls h2 {
+    order: -1;
+  }
+}
+
+/* Añadir estos estilos a tu archivo MealPlanner.css */
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.meal-info {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  word-break: break-word;
+}
+
+.meal-title {
+  font-size: 0.85rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
 } 
