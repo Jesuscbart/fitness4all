@@ -314,4 +314,104 @@
   white-space: nowrap;
   width: 100%;
   max-width: 100%;
+}
+
+.ai-import-section {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-import-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  width: 100%;
+  max-width: 500px;
+}
+
+.ai-import-button:hover {
+  background-color: #45a049;
+}
+
+.ai-import-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #4CAF50;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Estilos para la selección de semanas */
+.weeks-selection {
+  margin: 15px 0;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.weeks-selection p {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+.weeks-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.week-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.week-checkbox-label:hover {
+  background-color: #e3e3e3;
+}
+
+.week-checkbox-label input {
+  margin-right: 5px;
+}
+
+/* Ajustes responsivos para la selección de semanas */
+@media (max-width: 576px) {
+  .weeks-checkboxes {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .week-checkbox-label {
+    width: 100%;
+  }
 } 
