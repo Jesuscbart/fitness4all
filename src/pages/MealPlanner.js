@@ -16,7 +16,10 @@ function MealPlanner() {
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
   const [savedMealPlan, setSavedMealPlan] = useState('');
-  const [selectedWeeks, setSelectedWeeks] = useState([1, 2, 3, 4, 5, 6]); // Por defecto todas las semanas seleccionadas
+  const [selectedWeeks, setSelectedWeeks] = useState([]); // Por defecto sin semanas seleccionadas
+  const [currentWeek, setCurrentWeek] = useState(0); // Almacena el número de la semana actual
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
+  const [weeksInMonth, setWeeksInMonth] = useState([]); // Array con los números de semana del mes
   
   // Nombres de los meses en español
   const monthNames = [
@@ -33,6 +36,13 @@ function MealPlanner() {
       fetchSavedMealPlan();
     }
   }, [currentUser]);
+
+  // Calcula la semana actual al cargar el componente
+  useEffect(() => {
+    const today = new Date();
+    const weekOfMonth = getWeekOfMonth(today);
+    setCurrentWeek(weekOfMonth);
+  }, []);
   
   // Obtiene el plan de comidas guardado en Firestore
   const fetchSavedMealPlan = async () => {
@@ -45,6 +55,20 @@ function MealPlanner() {
     } catch (error) {
       console.error('Error al obtener el plan de comidas:', error);
     }
+  };
+
+  // Calcula el número de semanas en el mes actual
+  const calculateWeeksInMonth = (year, month) => {
+    // Primer día del mes
+    const firstDayOfMonth = new Date(year, month, 1);
+    // Último día del mes
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    
+    // Obtener la semana del último día del mes
+    const lastWeek = getWeekOfMonth(lastDayOfMonth);
+    
+    // Crear un array con los números de semana
+    return Array.from({ length: lastWeek }, (_, i) => i + 1);
   };
   
   // Genera los días del calendario para el mes actual
@@ -77,6 +101,10 @@ function MealPlanner() {
     }
     
     setCalendarDays(days);
+    
+    // Calcular el número de semanas en el mes
+    const weeks = calculateWeeksInMonth(year, month);
+    setWeeksInMonth(weeks);
     
     // Cargar datos del mes actual cuando cambia el mes
     if (currentUser) {
@@ -187,11 +215,54 @@ function MealPlanner() {
       const calendarDocRef = doc(db, 'users', currentUser.uid, 'calendars', calendarId);
       await setDoc(calendarDocRef, updatedMeals);
       
-      // Actualizar el estado local
+      // Actualizar el estado local para mostrar los cambios inmediatamente
       setMeals(updatedMeals);
       closeModal();
     } catch (error) {
       console.error('Error al guardar la comida:', error);
+    }
+  };
+
+  // Elimina la comida seleccionada
+  const deleteMeal = async () => {
+    if (!selectedMeal) return;
+    
+    const year = selectedMeal.date.getFullYear();
+    const month = selectedMeal.date.getMonth();
+    const day = selectedMeal.date.getDate().toString();
+    const calendarId = `${year}-${month + 1}`;
+    
+    try {
+      // Crear un objeto con los datos actualizados
+      const updatedMeals = { ...meals };
+      
+      // Verificar si existe el día y la comida
+      if (updatedMeals[day] && updatedMeals[day][selectedMeal.mealType]) {
+        // Eliminar la comida
+        delete updatedMeals[day][selectedMeal.mealType];
+        
+        // Si no quedan comidas en ese día, eliminar el objeto del día
+        if (Object.keys(updatedMeals[day]).length === 0) {
+          delete updatedMeals[day];
+        }
+        
+        // Guardar en Firebase
+        const calendarDocRef = doc(db, 'users', currentUser.uid, 'calendars', calendarId);
+        await setDoc(calendarDocRef, updatedMeals);
+        
+        // Actualizar el estado local
+        setMeals(updatedMeals);
+        
+        // Mostrar mensaje de éxito
+        setSuccessMessage('Comida eliminada correctamente');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+        
+        closeModal();
+      }
+    } catch (error) {
+      console.error('Error al eliminar la comida:', error);
     }
   };
   
@@ -273,7 +344,7 @@ function MealPlanner() {
           'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-mini',
           messages: [
             {
               role: 'system',
@@ -407,17 +478,25 @@ ${savedMealPlan}`
       // Guardar en Firebase
       await setDoc(calendarDocRef, combinedMeals);
       
-      // Actualizar el estado local
+      // Actualizar el estado local para mostrar los cambios inmediatamente
       setMeals(combinedMeals);
       
-      // Recargar las comidas del mes actual para mostrar los cambios
-      loadMeals(currentDate.getFullYear(), currentDate.getMonth() + 1);
+      // Mostrar mensaje de éxito personalizado
+      setSuccessMessage('¡Plan de comidas añadido al calendario con éxito!');
       
-      alert('¡Plan de comidas añadido al calendario con éxito!');
+      // Ocultar el mensaje después de 5 segundos
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
       
     } catch (error) {
       console.error('Error al procesar el plan de comidas:', error);
-      alert('Error al procesar el plan de comidas. Por favor, inténtalo de nuevo.');
+      setSuccessMessage('Error al procesar el plan de comidas. Por favor, inténtalo de nuevo.');
+      
+      // Ocultar el mensaje de error después de 5 segundos
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
     } finally {
       setIsProcessingAI(false);
     }
@@ -442,7 +521,7 @@ ${savedMealPlan}`
         <button 
           className="ai-import-button" 
           onClick={processMealPlanWithAI}
-          disabled={isProcessingAI || !savedMealPlan}
+          disabled={isProcessingAI || !savedMealPlan || selectedWeeks.length === 0}
         >
           {isProcessingAI ? (
             <>
@@ -458,17 +537,26 @@ ${savedMealPlan}`
       <div className="weeks-selection">
         <p>Selecciona las semanas para aplicar el plan:</p>
         <div className="weeks-checkboxes">
-          {[1, 2, 3, 4, 5, 6].map(week => (
-            <label key={week} className="week-checkbox-label">
+          {weeksInMonth.map(week => (
+            <label 
+              key={week} 
+              className={`week-checkbox-label ${week === currentWeek ? 'current-week' : ''}`}
+            >
               <input
                 type="checkbox"
                 checked={selectedWeeks.includes(week)}
                 onChange={() => handleWeekSelection(week)}
               />
-              Semana {week}
+              Semana {week} {week === currentWeek ? '(actual)' : ''}
             </label>
           ))}
         </div>
+        
+        {successMessage && (
+          <div className="success-message">
+            {successMessage}
+          </div>
+        )}
       </div>
       
       <div className="calendar-controls">
@@ -563,6 +651,7 @@ ${savedMealPlan}`
                 ></textarea>
               </div>
               <div className="form-actions">
+                <button className="delete-button" onClick={deleteMeal}>Eliminar</button>
                 <button className="save-button" onClick={saveMeal}>Guardar</button>
               </div>
             </div>

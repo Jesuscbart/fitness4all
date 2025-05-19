@@ -60,7 +60,7 @@ function ExerciseLog() {
           'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}` 
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-mini',
           messages: [
             {
               role: 'system',
