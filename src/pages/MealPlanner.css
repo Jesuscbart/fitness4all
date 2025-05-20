@@ -2,6 +2,14 @@
   max-width: 95%;
   margin: 0 auto;
   padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.meal-planner h1 {
+  text-align: center;
+  width: 100%;
 }
 
 .calendar-controls {
@@ -9,6 +17,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .calendar-controls button {
@@ -336,19 +346,20 @@
   max-width: 100%;
 }
 
-.ai-import-section {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
+/* Estilos compartidos para mantener el ancho uniforme y centrado */
+.ai-import-section,
+.weeks-selection {
+  width: 100%;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
-  width: 100%;
+  margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .ai-import-button {
+  display: block;
+  width: 100%;
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -357,7 +368,7 @@
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s;
-  width: 100%;
+  text-align: center;
 }
 
 .ai-import-button:hover {
@@ -367,6 +378,7 @@
 .ai-import-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .loading-spinner {
@@ -385,14 +397,10 @@
 
 /* Estilos para la selección de semanas */
 .weeks-selection {
-  margin: 15px 0;
   padding: 10px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background-color: #f9f9f9;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .weeks-selection p {
@@ -471,4 +479,79 @@
   background-color: #cccccc;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+/* Botón para vaciar mes */
+.clear-month-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.clear-month-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.clear-month-button:hover {
+  background-color: #c82333;
+}
+
+/* Modal de confirmación - Estilos simplificados */
+.confirmation-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmation-modal {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.confirm-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
 } 

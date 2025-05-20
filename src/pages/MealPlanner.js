@@ -20,6 +20,7 @@ function MealPlanner() {
   const [currentWeek, setCurrentWeek] = useState(0); // Almacena el número de la semana actual
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
   const [weeksInMonth, setWeeksInMonth] = useState([]); // Array con los números de semana del mes
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Estado para el modal de confirmación
   
   // Nombres de los meses en español
   const monthNames = [
@@ -149,6 +150,13 @@ function MealPlanner() {
     return date.getDate() === today.getDate() &&
            date.getMonth() === today.getMonth() &&
            date.getFullYear() === today.getFullYear();
+  };
+
+  // Verifica si estamos en el mes actual
+  const isCurrentMonth = () => {
+    const today = new Date();
+    return currentDate.getMonth() === today.getMonth() && 
+           currentDate.getFullYear() === today.getFullYear();
   };
 
   // Abre el modal con la información de la comida seleccionada
@@ -300,14 +308,13 @@ function MealPlanner() {
     
     setIsProcessingAI(true);
     try {
-      // Obtener la fecha actual para determinar la semana
-      const today = new Date();
-      const currentYear = today.getFullYear();
-      const currentMonth = today.getMonth();
-      const currentMonthName = monthNames[currentMonth];
+      // Usar el mes seleccionado en el calendario
+      const selectedYear = currentDate.getFullYear();
+      const selectedMonth = currentDate.getMonth();
+      const selectedMonthName = monthNames[selectedMonth];
       
-      // Calcular todos los días del mes y organizarlos por día de la semana
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      // Calcular todos los días del mes seleccionado y organizarlos por día de la semana
+      const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
       const daysOfWeekMap = {
         "Lunes": [],
         "Martes": [],
@@ -320,7 +327,7 @@ function MealPlanner() {
       
       // Llenar el mapa con los números de días correspondientes a cada día de la semana
       for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(currentYear, currentMonth, day);
+        const date = new Date(selectedYear, selectedMonth, day);
         // getDay() devuelve 0 para domingo, 1 para lunes, etc.
         // Convertimos a nuestro formato donde 0 es lunes, 1 es martes, etc.
         const dayOfWeekIndex = (date.getDay() + 6) % 7;
@@ -334,7 +341,7 @@ function MealPlanner() {
         daysMapping[dayName] = days;
       });
       
-      console.log("Mapeo de días para el mes:", daysMapping);
+      console.log(`Mapeo de días para el mes ${selectedMonthName}:`, daysMapping);
       
       // Enviar solicitud a la API de OpenAI
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -344,13 +351,13 @@ function MealPlanner() {
           'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-mini',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
               content: `Eres un asistente especializado en procesamiento de datos. Tu tarea es convertir un plan de comidas en formato Markdown a un formato JSON estructurado para un calendario MENSUAL.
 
-              A continuación te proporciono un mapeo de los días del mes actual (${currentMonthName}) con su día de la semana correspondiente:
+              A continuación te proporciono un mapeo de los días del mes ${selectedMonthName} de ${selectedYear} con su día de la semana correspondiente:
               ${JSON.stringify(daysMapping, null, 2)}
               
               Por ejemplo, en este mes, los días ${daysMapping["Lunes"].join(", ")} son lunes.
@@ -444,8 +451,8 @@ ${savedMealPlan}`
         throw new Error('La respuesta no es un objeto JSON válido');
       }
       
-      // Guardar el plan formateado en Firebase
-      const calendarId = `${currentYear}-${currentMonth + 1}`;
+      // Guardar el plan formateado en Firebase usando el mes seleccionado
+      const calendarId = `${selectedYear}-${selectedMonth + 1}`;
       const calendarDocRef = doc(db, 'users', currentUser.uid, 'calendars', calendarId);
       
       // Verificar si ya existen comidas para este mes
@@ -459,10 +466,10 @@ ${savedMealPlan}`
       // Filtrar solo los días que pertenecen a las semanas seleccionadas
       const filteredMealPlan = {};
       
-      // Recorrer todos los días del mes
+      // Recorrer todos los días del mes seleccionado
       Object.keys(formattedMealPlan).forEach(day => {
         // Convertir el día a objeto Date
-        const date = new Date(currentYear, currentMonth, parseInt(day));
+        const date = new Date(selectedYear, selectedMonth, parseInt(day));
         // Obtener la semana del mes
         const weekOfMonth = getWeekOfMonth(date);
         
@@ -475,14 +482,14 @@ ${savedMealPlan}`
       // Combinar las comidas existentes con las nuevas
       const combinedMeals = { ...existingMeals, ...filteredMealPlan };
       
-      // Guardar en Firebase
+      // Guardar en Firebase en el mes seleccionado
       await setDoc(calendarDocRef, combinedMeals);
       
       // Actualizar el estado local para mostrar los cambios inmediatamente
       setMeals(combinedMeals);
       
       // Mostrar mensaje de éxito personalizado
-      setSuccessMessage('¡Plan de comidas añadido al calendario con éxito!');
+      setSuccessMessage(`¡Plan de comidas añadido al calendario de ${selectedMonthName} ${selectedYear} con éxito!`);
       
       // Ocultar el mensaje después de 5 segundos
       setTimeout(() => {
@@ -513,6 +520,48 @@ ${savedMealPlan}`
     }
   };
 
+  // Función para vaciar el mes actual
+  const clearCurrentMonth = async () => {
+    setIsConfirmModalOpen(false); // Cierra el modal de confirmación
+    
+    try {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const calendarId = `${year}-${month + 1}`;
+      
+      // Referencia al documento del calendario actual
+      const calendarDocRef = doc(db, 'users', currentUser.uid, 'calendars', calendarId);
+      
+      // Establecer un objeto vacío para borrar todas las comidas
+      await setDoc(calendarDocRef, {});
+      
+      // Actualizar el estado local
+      setMeals({});
+      
+      // Mostrar mensaje de éxito
+      setSuccessMessage('Se han eliminado todas las comidas del mes');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    } catch (error) {
+      console.error('Error al vaciar el mes:', error);
+      setSuccessMessage('Error al eliminar las comidas. Por favor, inténtalo de nuevo.');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    }
+  };
+
+  // Abre el modal de confirmación para vaciar el mes
+  const openConfirmModal = () => {
+    setIsConfirmModalOpen(true);
+  };
+  
+  // Cierra el modal de confirmación
+  const closeConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+  };
+
   return (
     <div className="meal-planner">
       <h1>Planificador de Comidas</h1>
@@ -540,14 +589,14 @@ ${savedMealPlan}`
           {weeksInMonth.map(week => (
             <label 
               key={week} 
-              className={`week-checkbox-label ${week === currentWeek ? 'current-week' : ''}`}
+              className={`week-checkbox-label ${isCurrentMonth() && week === currentWeek ? 'current-week' : ''}`}
             >
               <input
                 type="checkbox"
                 checked={selectedWeeks.includes(week)}
                 onChange={() => handleWeekSelection(week)}
               />
-              Semana {week} {week === currentWeek ? '(actual)' : ''}
+              Semana {week} {isCurrentMonth() && week === currentWeek ? '(actual)' : ''}
             </label>
           ))}
         </div>
@@ -627,6 +676,14 @@ ${savedMealPlan}`
         </div>
       )}
 
+      {/* Botón para vaciar el mes actual */}
+      <div className="clear-month-container">
+        <button className="clear-month-button" onClick={openConfirmModal}>
+          🗑️ Vaciar mes actual
+        </button>
+      </div>
+
+      {/* Modal de edición de comida */}
       {isModalOpen && selectedMeal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -654,6 +711,21 @@ ${savedMealPlan}`
                 <button className="delete-button" onClick={deleteMeal}>Eliminar</button>
                 <button className="save-button" onClick={saveMeal}>Guardar</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para vaciar el mes */}
+      {isConfirmModalOpen && (
+        <div className="confirmation-modal-overlay" onClick={closeConfirmModal}>
+          <div className="confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirmar eliminación</h3>
+            <p>¿Estás seguro de que deseas eliminar todas las comidas del mes de {monthNames[currentDate.getMonth()]}?</p>
+            <p>Esta acción no se puede deshacer.</p>
+            <div className="confirmation-buttons">
+              <button className="cancel-button" onClick={closeConfirmModal}>Cancelar</button>
+              <button className="confirm-button" onClick={clearCurrentMonth}>Eliminar todo</button>
             </div>
           </div>
         </div>
