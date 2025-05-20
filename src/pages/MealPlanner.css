@@ -1,0 +1,557 @@
+.meal-planner {
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.meal-planner h1 {
+  text-align: center;
+  width: 100%;
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.calendar-controls button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.calendar-controls button:hover {
+  background-color: #007bff;
+}
+
+.calendar {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.calendar-header,
+.calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+}
+
+.calendar-header .calendar-cell.day-name {
+  min-height: 20px;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+}
+
+.day-name {
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.calendar-body {
+  grid-auto-rows: minmax(180px, auto);
+}
+
+.calendar-cell {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-cell.empty {
+  background-color: #f9f9f9;
+}
+
+.calendar-cell.today {
+  background-color: #b9d5ec;
+}
+
+.day-number {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.today .day-number {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Estilos para las secciones de comidas */
+.meal-sections {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 30px);
+  margin-top: 30px;
+}
+
+.meal-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.meal-section:last-child {
+  border-bottom: none;
+}
+
+.meal-card {
+  width: 90%;
+  height: 80%;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.meal-card:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.05);
+}
+
+.meal-icon {
+  font-size: 1.5rem;
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.meal-form {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.save-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  flex: 1;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  flex: 1;
+}
+
+.save-button:hover {
+  background-color: #0069d9;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1200px) {
+  .meal-title {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .calendar-cell {
+    padding: 8px;
+    min-height: 150px;
+  }
+  
+  .meal-section {
+    padding: 3px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .meal-planner {
+    padding: 10px 5px;
+  }
+  
+  .calendar {
+    overflow-x: auto;
+  }
+  
+  /* Configuración para activar scroll horizontal */
+  .calendar-header,
+  .calendar-body {
+    min-width: 768px;
+  }
+  
+  .calendar-cell {
+    min-height: 120px;
+  }
+  
+  .meal-title {
+    font-size: 0.75rem;
+  }
+}
+
+/* Estilos adicionales para pantallas muy pequeñas */
+@media (max-width: 576px) {
+  .calendar-header,
+  .calendar-body {
+    min-width: 700px; /* Ancho mínimo antes de activar scroll */
+  }
+  
+  .calendar-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .calendar-controls h2 {
+    order: -1;
+  }
+}
+
+/* Añadir estos estilos a tu archivo MealPlanner.css */
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+}
+
+.meal-info {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  word-break: break-word;
+}
+
+.meal-title {
+  font-size: 0.85rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Estilos compartidos para mantener el ancho uniforme y centrado */
+.ai-import-section,
+.weeks-selection {
+  width: 100%;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.ai-import-button {
+  display: block;
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.ai-import-button:hover {
+  background-color: #45a049;
+}
+
+.ai-import-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #4CAF50;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Estilos para la selección de semanas */
+.weeks-selection {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.weeks-selection p {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+.weeks-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.week-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.week-checkbox-label:hover {
+  background-color: #e3e3e3;
+}
+
+.week-checkbox-label input {
+  margin-right: 5px;
+}
+
+/* Ajustes responsivos para la selección de semanas */
+@media (max-width: 576px) {
+  .weeks-checkboxes {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .week-checkbox-label {
+    width: 100%;
+  }
+}
+
+/* Estilos para la semana actual */
+.week-checkbox-label.current-week {
+  background-color: #e0f0ff;
+  font-weight: bold;
+  border-color: #007bff;
+}
+
+/* Estilos para el mensaje de éxito */
+.success-message {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: 500;
+  animation: fadeOut 5s forwards;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Estilos para el botón deshabilitado cuando no hay semanas seleccionadas */
+.ai-import-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Botón para vaciar mes */
+.clear-month-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+
+.clear-month-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.clear-month-button:hover {
+  background-color: #c82333;
+}
+
+/* Modal de confirmación - Estilos simplificados */
+.confirmation-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmation-modal {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.confirm-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+} 
