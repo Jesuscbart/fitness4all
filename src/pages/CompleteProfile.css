@@ -14,9 +14,10 @@ code {
 
 .error {
   color: red;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: bold; 
-  margin-top: 5px;
+  margin-top: 2px;
+  margin-bottom: 0;
   text-align: left;
 }
 
@@ -31,13 +32,158 @@ code {
 .complete-profile-form {
   display: flex;
   flex-direction: column;
-  align-items: stretch; 
-  text-align: center; 
+  align-items: center;
+  max-width: 450px;
+  margin: 30px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.complete-profile-form h2 {
+  color: #007bff;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  text-align: center;
+  width: 100%;
+}
+
+.complete-profile-form div {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.complete-profile-form label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 6px;
+  display: block;
+  font-size: 1rem;
+}
+
+.complete-profile-form input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.complete-profile-form input[type="number"]:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.complete-profile-form input[type="number"]::placeholder {
+  color: #adb5bd;
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.radio-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.radio-option {
+  position: relative;
+  width: 120px;
+  text-align: center;
+}
+
+.radio-option input[type="radio"] {
+  opacity: 0;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.radio-option label.radio-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  border: 2px solid #e9ecef;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 500;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.radio-option label.radio-label::before {
+  display: none;
+}
+
+.radio-option input[type="radio"]:checked + label.radio-label {
+  background-color: #e6f2ff;
+  border-color: #007bff;
+  color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.radio-option:hover label.radio-label {
+  background-color: #e9ecef;
 }
 
 .complete-profile-form button {
   display: block;
-  align-self: center; 
-  margin: 20px 0 0 0; 
-  width: auto; 
+  width: 60%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 15px;
+  transition: background-color 0.2s;
+}
+
+.complete-profile-form button:hover {
+  background-color: #0069d9;
+}
+
+.complete-profile-form button:active {
+  background-color: #0062cc;
+}
+
+@media (max-width: 576px) {
+  .complete-profile-form {
+    padding: 20px;
+    width: 85%;
+  }
+  
+  .radio-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.gender-icon {
+  font-size: 32px;
+  margin-bottom: 5px;
+  font-weight: normal;
+  line-height: 1;
+  color: #6c757d;
+  transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked + label.radio-label .gender-icon {
+  color: #007bff;
 }

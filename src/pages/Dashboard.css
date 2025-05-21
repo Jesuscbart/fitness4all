@@ -7,6 +7,12 @@
   color: #007bff;
 }
 
+.dashboard h2 {
+  color: #007bff;
+  margin-top: 30px;
+  font-size: 1.8rem;
+}
+
 .dashboard button {
   background-color: #007bff;
   color: white;
@@ -38,6 +44,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
@@ -100,55 +107,250 @@
   font-weight: bold;
 }
 
-.goal-section {
-  margin-top: 20px;
+/* Estilos para el cuestionario */
+.questionnaire-section {
+  max-width: 800px;
+  margin: 30px auto;
+  background-color: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.goal-section p {
-  font-size: 1.2rem;
-  color: #333;
+.questionnaire-section h2 {
+  margin-bottom: 15px;
+  color: #007bff;
+  text-align: center;
 }
 
-.goal-section input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
+.questionnaire-section p {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #6c757d;
 }
 
-.goal-section textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-  resize: vertical;
-  max-width: 1000px; 
-  margin: 10px auto;
+.questionnaire-form {
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 28px;
+  position: relative;
+  background-color: #fff;
+  padding: 18px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.form-group:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.form-group label {
   display: block;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.description-text {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: -8px;
+  margin-bottom: 12px;
+  font-style: italic;
+  text-align: left;
+  display: block;
+  padding-left: 2px;
+  width: 100%;
+}
+
+/* Estilos para campos condicionales */
+.conditional-field {
+  margin-top: 15px;
+  margin-left: 15px;
+  padding-left: 15px;
+  border-left: 3px solid #007bff;
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+}
+
+.conditional-field::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 3px;
+  background-color: #007bff;
+  left: -10px;
+  top: 10px;
+}
+
+.conditional-field label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group select, 
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #495057;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-group textarea {
+  height: 80px;
+  resize: vertical;
+}
+
+.range-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.range-container input[type="range"] {
+  width: 90%;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-bottom: 5px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  margin-bottom: 8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin-right: 5px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox-item label {
+  margin: 0;
+  font-weight: normal;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: inline;
+}
+
+.submit-questionnaire {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-top: 15px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.submit-questionnaire:hover {
+  background-color: #218838;
+}
+
+/* Estilos para la sección de resultados */
+.results-section {
+  max-width: 800px;
+  margin: 30px auto;
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.prompt-preview {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border-left: 4px solid #007bff;
+}
+
+.prompt-preview h3 {
+  margin-top: 0;
+  color: #495057;
+}
+
+.prompt-preview pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .markdown-preview {
-  max-width: 1000px; 
-  margin: 20px auto;
+  max-width: 100%;
+  margin: 20px 0;
   text-align: left;
   background-color: #fff;
   padding: 10px;
   border-radius: 5px;
 }
 
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .lds-ring {
   color: #007bff;
   width: 40px; 
-  height: 40px; 
+  height: 40px;
+  position: relative;
 }
+
 .lds-ring,
 .lds-ring div {
   box-sizing: border-box;
 }
+
 .lds-ring div {
   box-sizing: border-box;
   display: block;
@@ -161,15 +363,19 @@
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: currentColor transparent transparent transparent;
 }
+
 .lds-ring div:nth-child(1) {
   animation-delay: -0.45s;
 }
+
 .lds-ring div:nth-child(2) {
   animation-delay: -0.3s;
 }
+
 .lds-ring div:nth-child(3) {
   animation-delay: -0.15s;
 }
+
 @keyframes lds-ring {
   0% {
     transform: rotate(0deg);
@@ -179,26 +385,10 @@
   }
 }
 
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
-
 .error {
   color: red;
   font-size: 0.9rem;
   font-weight: bold; 
   margin-top: 5px;
   text-align: left;
-}
-
-.exercise-plan {
-  max-width: 600px; 
-  margin: 20px auto; 
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
 }
