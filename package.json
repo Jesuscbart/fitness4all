@@ -7,10 +7,14 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/node": "^22.15.21",
+    "@types/nodemailer": "^6.4.17",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.6",
+    "dotenv": "^16.5.0",
     "firebase": "^11.0.1",
+    "nodemailer": "^7.0.3",
     "openai": "^4.77.3",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
@@ -19,6 +23,7 @@
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.27.0",
     "react-scripts": "^5.0.1",
+    "typescript": "^5.8.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -467,33 +467,95 @@ function Dashboard() {
     let infoAdicionalTexto = informacionAdicional ? 
       `Información adicional importante: ${informacionAdicional}` : 
       '';
-    
-    return `Mi objetivo principal es ${objetivoTexto}.
-${condicionMedicaTexto}.
-${lesionTexto}.
 
-${frecuenciaEjercicioTexto}.
-${tiposEjercicioTexto}.
-${tiempoEntrenamientoTexto}.
-${lugarEntrenamientoTexto}.
-${materialDisponibleTexto}.
-${trabajoTexto}.
-${pasosTexto}.
+    // Calcular IMC y categoría
+    const imc = calculateBMI(userData?.height, userData?.weight);
+    const getIMCCategory = (imc) => {
+      if (!imc) return 'No calculable';
+      const imcNum = parseFloat(imc);
+      if (imcNum < 18.5) return 'Bajo peso';
+      if (imcNum < 25) return 'Peso normal';
+      if (imcNum < 30) return 'Sobrepeso';
+      return 'Obesidad';
+    };
 
-${alimentacionTexto}.
-${comidasTexto}.
-${picaTexto}.
-${comeFueraTexto}.
-${restriccionesAlimentariasTexto}.
-${alimentosEvitarTexto}.
-${alimentosFavoritosTexto}.
-${consumosTexto}.
+    // Mapear objetivos con más detalle
+    const mapearObjetivo = (objetivo, otro = '') => {
+      const mapa = {
+        'perder_peso': 'perder peso y reducir grasa corporal',
+        'ganar_musculo': 'aumentar masa muscular y fuerza',
+        'mantener_peso': 'mantener mi peso actual',
+        'mejorar_condicion': 'mejorar mi condición física general',
+        'mejorar_salud': 'mejorar mi salud y bienestar general',
+        'mejorar_rendimiento': 'mejorar mi rendimiento deportivo',
+        'mantenerme': 'mantenerme en forma y activo',
+        'otro': otro
+      };
+      return mapa[objetivo] || 'mejorar mi condición física';
+    };
 
-${suenoTexto}.
-${expectativasTexto}.
-${infoAdicionalTexto}
+    // Crear prompt profesional estructurado
+    return `# PERFIL COMPLETO DE CLIENTE PARA PLAN PERSONALIZADO DE FITNESS Y NUTRICIÓN
 
-Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'hombre' ? 'hombre' : userData?.sex === 'mujer' ? 'mujer' : 'no especificado'}, mi altura es ${userData?.height || 'desconocida'} cm y mi peso es ${userData?.weight || 'desconocido'} kg.`;
+## INFORMACIÓN DEMOGRÁFICA Y ANTROPOMÉTRICA
+- **Edad:** ${userData?.age || 'No especificada'} años
+- **Sexo:** ${userData?.sex === 'hombre' ? 'Masculino' : userData?.sex === 'mujer' ? 'Femenino' : 'No especificado'}
+- **Altura:** ${userData?.height || 'No especificada'} cm
+- **Peso actual:** ${userData?.weight || 'No especificado'} kg
+- **IMC:** ${imc || 'No calculable'} (${getIMCCategory(imc)})
+
+## OBJETIVO PRINCIPAL Y EXPECTATIVAS
+**Objetivo primario:** ${mapearObjetivo(objetivoPrincipal, objetivoOtro)}
+
+**Expectativas específicas:** ${expectativas || 'El cliente no ha especificado expectativas particulares, busca orientación profesional.'}
+
+## ESTADO DE SALUD Y LIMITACIONES
+**Condiciones médicas:** ${condicionMedica === 'si' ? condicionMedicaDetalle : 'Sin condiciones médicas relevantes reportadas'}
+
+**Lesiones o limitaciones físicas:** ${lesion === 'si' ? lesionDetalle : 'Sin lesiones o dolores habituales reportados'}
+
+## PERFIL DE ACTIVIDAD FÍSICA ACTUAL
+- **Nivel de actividad:** ${frecuenciaEjercicioTexto}
+- **Tipos de ejercicio practicados:** ${tiposEjercicioTexto}
+- **Tiempo disponible para entrenar:** ${tiempoEntrenamiento ? tiempoEntrenamiento.replace('-', ' a ') + ' minutos por sesión' : 'No especificado'}
+- **Lugar preferido de entrenamiento:** ${lugarEntrenamientoTexto.replace('Prefiero entrenar en ', '')}
+- **Equipamiento disponible:** ${materialDisponibleTexto.replace('Dispongo del siguiente material: ', '').replace('No dispongo de material para entrenar', 'Sin equipamiento específico')}
+
+## ESTILO DE VIDA Y ACTIVIDAD DIARIA
+- **Tipo de trabajo:** ${trabajoTexto.replace('Mi trabajo es principalmente ', '')}
+- **Actividad diaria:** ${pasosTexto.replace('Doy aproximadamente ', '')}
+- **Horas de sueño:** ${suenoTexto.replace('Duermo normalmente ', '')}
+
+## PERFIL NUTRICIONAL Y HÁBITOS ALIMENTARIOS
+- **Autoevaluación de alimentación actual:** ${alimentacionTexto.replace('Considero que mi alimentación actual es ', '')}
+- **Estructura de comidas:** ${comidasTexto}
+- **Picoteo entre comidas:** ${picaTexto}
+- **Frecuencia de comidas fuera de casa:** ${comeFueraTexto}
+- **Restricciones alimentarias:** ${restriccionesAlimentariasTexto}
+- **Alimentos a evitar:** ${alimentosEvitarTexto}
+- **Alimentos favoritos:** ${alimentosFavoritosTexto}
+- **Hábitos de consumo:** ${consumosTexto}
+
+## INFORMACIÓN ADICIONAL RELEVANTE
+${infoAdicionalTexto || 'No se ha proporcionado información adicional específica.'}
+
+## INSTRUCCIONES PARA EL PROFESIONAL/IA
+Por favor, utiliza esta información para crear un plan integral que incluya:
+
+1. **Plan de entrenamiento personalizado** adaptado al nivel actual, tiempo disponible y equipamiento
+2. **Plan nutricional específico** que considere las restricciones, preferencias y objetivos
+3. **Recomendaciones de estilo de vida** para optimizar resultados
+4. **Progresión gradual y realista** basada en el perfil actual del cliente
+5. **Consideraciones especiales** para cualquier limitación médica o física reportada
+
+**Fecha de evaluación:** ${new Date().toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })}
+
+---
+*Este perfil ha sido generado automáticamente a partir de un cuestionario estructurado completado por el cliente.*`;
   };
 
   // Envía el cuestionario y guarda el prompt en la base de datos
@@ -551,51 +613,51 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
 
   return (
     <div className="dashboard">
-      <div className="dashboard-header">
+          <div className="dashboard-header">
         <h1>¡Hola, {userData?.name}!</h1>
         <p className="welcome-message">
           ¿Quieres hacer un cambio real en tu vida? Estás a solo un cuestionario de conseguir tu plan personalizado de fitness y nutrición.
         </p>
-      </div>
+          </div>
 
-      <div className="dashboard-content">
-        <div className="user-section">
-          <div className="user-stats-card">
+          <div className="dashboard-content">
+            <div className="user-section">
+              <div className="user-stats-card">
             <h3>Tus datos actuales</h3>
             {userData && (
-              <div className="user-metrics">
-                <div className="metric-item">
-                  <span className="metric-label">Edad:</span>
-                  <span className="metric-value">{userData.age || 'No especificada'}</span>
-                </div>
+                <div className="user-metrics">
+                  <div className="metric-item">
+                    <span className="metric-label">Edad:</span>
+                    <span className="metric-value">{userData.age || 'No especificada'}</span>
+                  </div>
                 <div className="metric-item">
                   <span className="metric-label">Sexo:</span>
                   <span className="metric-value">
-                    {userData.sex === 'hombre' ? 'Hombre' : userData.sex === 'mujer' ? 'Mujer' : 'No especificado'}
+                    {userData.sex === 'hombre' ? 'Hombre' : userData?.sex === 'mujer' ? 'Mujer' : 'No especificado'}
                   </span>
                 </div>
-                <div className="metric-item">
-                  <span className="metric-label">Altura:</span>
+                  <div className="metric-item">
+                    <span className="metric-label">Altura:</span>
                   <span className="metric-value">{userData.height ? `${userData.height} cm` : 'No especificada'}</span>
-                </div>
-                <div className="metric-item">
-                  <span className="metric-label">Peso:</span>
+                  </div>
+                  <div className="metric-item">
+                    <span className="metric-label">Peso:</span>
                   <span className="metric-value">{userData.weight ? `${userData.weight} kg` : 'No especificado'}</span>
-                </div>
-                <div className="metric-item">
-                  <span className="metric-label">IMC:</span>
+                  </div>
+                  <div className="metric-item">
+                    <span className="metric-label">IMC:</span>
                   <span className="metric-value">
                     {calculateBMI(userData.height, userData.weight) || 'No calculable'}
                   </span>
+                  </div>
                 </div>
-              </div>
             )}
             <button onClick={handleOpenModal} className="update-data-btn">
               Actualizar Datos
             </button>
             {updateMessage && <p className="success-message">{updateMessage}</p>}
-          </div>
-        </div>
+              </div>
+            </div>
 
         {isModalOpen && (
           <div className="modal-overlay">
@@ -638,7 +700,7 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                     />
                     {errors.height && <p className="error-text">{errors.height}</p>}
                   </div>
-                </div>
+                  </div>
                 <div className="form-row">
                   <div className="input-group">
                     <label htmlFor="weight">Peso (kg)</label>
@@ -657,7 +719,7 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                   </div>
                   <div className="input-group">
                     <label htmlFor="weightDate">Fecha del registro</label>
-                    <input 
+                    <input
                       type="date" 
                       id="weightDate" 
                       name="weightDate" 
@@ -665,12 +727,12 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                       onChange={(e) => setWeightDate(e.target.value)} 
                     />
                   </div>
-                </div>
+                  </div>
                 <button type="submit" className="save-button">
                   <span>💾</span> Guardar Cambios
                 </button>
               </form>
-            </div>
+                  </div>
           </div>
         )}
 
@@ -687,9 +749,9 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
               <label htmlFor="objetivoPrincipal">¿Cuál es tu objetivo principal?</label>
               <select 
                 id="objetivoPrincipal" 
-                name="objetivoPrincipal" 
+                      name="objetivoPrincipal"
                 value={questionnaireData.objetivoPrincipal}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="perder_peso">Perder peso</option>
                 <option value="ganar_musculo">Ganar músculo</option>
@@ -701,90 +763,90 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                 <option value="otro">Otro</option>
               </select>
               
-              {questionnaireData.objetivoPrincipal === 'otro' && (
+                    {questionnaireData.objetivoPrincipal === 'otro' && (
                 <div className="conditional-field">
                   <label htmlFor="objetivoOtro">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                      <input
+                        type="text"
                     id="objetivoOtro"
-                    name="objetivoOtro"
-                    value={questionnaireData.objetivoOtro}
-                    onChange={handleQuestionnaireChange}
+                        name="objetivoOtro"
+                        value={questionnaireData.objetivoOtro}
+                        onChange={handleQuestionnaireChange}
                     placeholder="Describe tu objetivo"
-                  />
+                      />
                 </div>
-              )}
-            </div>
+                    )}
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="condicionMedica">¿Tienes alguna condición médica relevante?</label>
               <div className="description-text">(Diabetes, hipertensión, colesterol, tiroides, asma, etc.)</div>
               <select 
                 id="condicionMedica" 
-                name="condicionMedica" 
+                      name="condicionMedica"
                 value={questionnaireData.condicionMedica}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="no">No</option>
                 <option value="si">Sí</option>
               </select>
               
-              {questionnaireData.condicionMedica === 'si' && (
-                <div className="conditional-field">
+                  {questionnaireData.condicionMedica === 'si' && (
+                    <div className="conditional-field">
                   <label htmlFor="condicionMedicaDetalle">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                      <input
+                        type="text"
                     id="condicionMedicaDetalle"
-                    name="condicionMedicaDetalle"
-                    value={questionnaireData.condicionMedicaDetalle}
-                    onChange={handleQuestionnaireChange}
+                        name="condicionMedicaDetalle"
+                        value={questionnaireData.condicionMedicaDetalle}
+                        onChange={handleQuestionnaireChange}
                     placeholder="Describe tu condición médica"
-                  />
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="lesion">¿Tienes alguna lesión o dolor habitual?</label>
               <select 
                 id="lesion" 
-                name="lesion" 
+                      name="lesion"
                 value={questionnaireData.lesion}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="no">No</option>
                 <option value="si">Sí</option>
               </select>
               
-              {questionnaireData.lesion === 'si' && (
-                <div className="conditional-field">
+                  {questionnaireData.lesion === 'si' && (
+                    <div className="conditional-field">
                   <label htmlFor="lesionDetalle">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                      <input
+                        type="text"
                     id="lesionDetalle"
-                    name="lesionDetalle"
-                    value={questionnaireData.lesionDetalle}
-                    onChange={handleQuestionnaireChange}
+                        name="lesionDetalle"
+                        value={questionnaireData.lesionDetalle}
+                        onChange={handleQuestionnaireChange}
                     placeholder="Describe tu lesión o dolor"
-                  />
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="frecuenciaEjercicio">¿Cuántas veces a la semana haces ejercicio?</label>
               <select 
                 id="frecuenciaEjercicio" 
-                name="frecuenciaEjercicio" 
+                      name="frecuenciaEjercicio"
                 value={questionnaireData.frecuenciaEjercicio}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="no_ejercicio">No hago ejercicio</option>
                 <option value="1-2">1-2 veces</option>
                 <option value="3-4">3-4 veces</option>
                 <option value="5+">5 o más veces</option>
               </select>
-            </div>
+                  </div>
             
             {questionnaireData.frecuenciaEjercicio !== 'no_ejercicio' && (
               <>
@@ -793,11 +855,11 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                   <div className="checkbox-group">
                     {tiposEjercicioOpciones.map(opcion => (
                       <div key={opcion} className="checkbox-item">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           id={`tiposEjercicio-${opcion}`} 
-                          name="tiposEjercicio" 
-                          value={opcion} 
+                          name="tiposEjercicio"
+                          value={opcion}
                           checked={questionnaireData.tiposEjercicio && questionnaireData.tiposEjercicio.includes(opcion)}
                           onChange={handleQuestionnaireChange}
                         />
@@ -816,25 +878,25 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                    questionnaireData.tiposEjercicio.includes('otro') && (
                     <div className="conditional-field">
                       <label htmlFor="tiposEjercicioOtro">Por favor, especifica:</label>
-                      <input
-                        type="text"
+                        <input
+                          type="text"
                         id="tiposEjercicioOtro"
-                        name="tiposEjercicioOtro"
-                        value={questionnaireData.tiposEjercicioOtro}
-                        onChange={handleQuestionnaireChange}
+                          name="tiposEjercicioOtro"
+                          value={questionnaireData.tiposEjercicioOtro}
+                          onChange={handleQuestionnaireChange}
                         placeholder="Describe el tipo de ejercicio"
-                      />
+                        />
                     </div>
-                  )}
-                </div>
+                      )}
+                    </div>
 
                 <div className="form-group">
                   <label htmlFor="tiempoEntrenamiento">¿Cuánto tiempo puedes dedicar a entrenar cada día?</label>
                   <select 
                     id="tiempoEntrenamiento" 
-                    name="tiempoEntrenamiento" 
+                      name="tiempoEntrenamiento"
                     value={questionnaireData.tiempoEntrenamiento}
-                    onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
                   >
                     <option value="15-30">15-30 minutos</option>
                     <option value="30-45">30-45 minutos</option>
@@ -843,17 +905,17 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                     <option value="75-90">75-90 minutos</option>
                     <option value="90+">+90 minutos</option>
                   </select>
-                </div>
+                  </div>
               </>
             )}
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="lugarEntrenamiento">¿Dónde prefieres entrenar?</label>
               <select 
                 id="lugarEntrenamiento" 
-                name="lugarEntrenamiento" 
+                      name="lugarEntrenamiento"
                 value={questionnaireData.lugarEntrenamiento}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="casa">En casa</option>
                 <option value="gimnasio">En gimnasio</option>
@@ -862,33 +924,33 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
               </select>
               
               {questionnaireData.lugarEntrenamiento === 'otro' && (
-                <div className="conditional-field">
+                  <div className="conditional-field">
                   <label htmlFor="lugarEntrenamientoOtro">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                      <input
+                        type="text"
                     id="lugarEntrenamientoOtro"
-                    name="lugarEntrenamientoOtro"
-                    value={questionnaireData.lugarEntrenamientoOtro}
-                    onChange={handleQuestionnaireChange}
+                        name="lugarEntrenamientoOtro"
+                        value={questionnaireData.lugarEntrenamientoOtro}
+                        onChange={handleQuestionnaireChange}
                     placeholder="Describe el lugar"
-                  />
+                      />
                 </div>
-              )}
-            </div>
+                    )}
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="materialDisponible">¿Qué material tienes disponible para entrenar?</label>
-              <div className="checkbox-group">
-                {materialDisponibleOpciones.map(opcion => (
+                  <div className="checkbox-group">
+                    {materialDisponibleOpciones.map(opcion => (
                   <div key={opcion} className="checkbox-item">
-                    <input 
-                      type="checkbox" 
+                        <input
+                          type="checkbox"
                       id={`materialDisponible-${opcion}`} 
-                      name="materialDisponible" 
-                      value={opcion} 
+                          name="materialDisponible"
+                          value={opcion}
                       checked={questionnaireData.materialDisponible && questionnaireData.materialDisponible.includes(opcion)}
-                      onChange={handleQuestionnaireChange}
-                    />
+                          onChange={handleQuestionnaireChange}
+                        />
                     <label htmlFor={`materialDisponible-${opcion}`}>
                       {opcion === 'ninguno' ? 'Ninguno' : 
                        opcion === 'bandas' ? 'Bandas elásticas' : 
@@ -897,61 +959,61 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                        opcion === 'bicicleta' ? 'Bicicleta estática/elíptica' : 
                        opcion === 'otro' ? 'Otro' : opcion}
                     </label>
-                  </div>
-                ))}
+                      </div>
+                    ))}
               </div>
               
               {questionnaireData.materialDisponible && 
                questionnaireData.materialDisponible.includes('otro') && (
                 <div className="conditional-field">
                   <label htmlFor="materialDisponibleOtro">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                        <input
+                          type="text"
                     id="materialDisponibleOtro"
-                    name="materialDisponibleOtro"
-                    value={questionnaireData.materialDisponibleOtro}
-                    onChange={handleQuestionnaireChange}
+                          name="materialDisponibleOtro"
+                          value={questionnaireData.materialDisponibleOtro}
+                          onChange={handleQuestionnaireChange}
                     placeholder="Describe el material"
-                  />
+                        />
                 </div>
-              )}
-            </div>
+                      )}
+                    </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="tipoTrabajo">¿Qué tipo de trabajo realizas?</label>
               <select 
                 id="tipoTrabajo" 
-                name="tipoTrabajo" 
+                      name="tipoTrabajo"
                 value={questionnaireData.tipoTrabajo}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="sedentario">Sedentario (sentado)</option>
                 <option value="activo">Activo (en movimiento)</option>
                 <option value="variado">Variado</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="pasosDiarios">¿Cuántos pasos das al día?</label>
               <select 
                 id="pasosDiarios" 
-                name="pasosDiarios" 
+                      name="pasosDiarios"
                 value={questionnaireData.pasosDiarios}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="menos_5000">Menos de 5.000</option>
                 <option value="5000-10000">Entre 5.000 y 10.000</option>
                 <option value="mas_10000">Más de 10.000</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="alimentacionActual">¿Cómo consideras tu alimentación actual?</label>
               <select 
                 id="alimentacionActual" 
-                name="alimentacionActual" 
+                      name="alimentacionActual"
                 value={questionnaireData.alimentacionActual}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="muy_poco">Muy poco saludable</option>
                 <option value="poco">Poco saludable</option>
@@ -959,15 +1021,15 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                 <option value="bastante">Bastante saludable</option>
                 <option value="muy_saludable">Muy saludable</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="comidasDiarias">¿Cuántas comidas principales haces al día?</label>
               <select 
                 id="comidasDiarias" 
-                name="comidasDiarias" 
+                      name="comidasDiarias"
                 value={questionnaireData.comidasDiarias}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="2">2 comidas</option>
                 <option value="3">3 comidas</option>
@@ -975,75 +1037,75 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                 <option value="5">5 comidas</option>
                 <option value="6">6 comidas</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="picaEntreHoras">¿Sueles picar entre horas?</label>
               <select 
                 id="picaEntreHoras" 
-                name="picaEntreHoras" 
+                      name="picaEntreHoras"
                 value={questionnaireData.picaEntreHoras}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="comeFuera">¿Sueles comer fuera de casa?</label>
               <select 
                 id="comeFuera" 
-                name="comeFuera" 
+                      name="comeFuera"
                 value={questionnaireData.comeFuera}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="restriccionesAlimentarias">¿Tienes alergias, intolerancias o restricciones alimentarias?</label>
               <div className="description-text">(Alergias, vegetarianismo, veganismo, alimentos prohibidos por religión, etc.)</div>
               <select 
                 id="restriccionesAlimentarias" 
-                name="restriccionesAlimentarias" 
+                      name="restriccionesAlimentarias"
                 value={questionnaireData.restriccionesAlimentarias}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="no">No</option>
                 <option value="si">Sí</option>
               </select>
               
-              {questionnaireData.restriccionesAlimentarias === 'si' && (
-                <div className="conditional-field">
+                  {questionnaireData.restriccionesAlimentarias === 'si' && (
+                    <div className="conditional-field">
                   <label htmlFor="restriccionesAlimentariasDetalle">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                      <input
+                        type="text"
                     id="restriccionesAlimentariasDetalle"
-                    name="restriccionesAlimentariasDetalle"
-                    value={questionnaireData.restriccionesAlimentariasDetalle}
-                    onChange={handleQuestionnaireChange}
+                        name="restriccionesAlimentariasDetalle"
+                        value={questionnaireData.restriccionesAlimentariasDetalle}
+                        onChange={handleQuestionnaireChange}
                     placeholder="Describe tus restricciones alimentarias"
-                  />
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="alimentosEvitar">¿Qué alimentos o grupos prefieres evitar?</label>
-              <div className="checkbox-group">
-                {alimentosEvitarOpciones.map(opcion => (
+                  <div className="checkbox-group">
+                    {alimentosEvitarOpciones.map(opcion => (
                   <div key={opcion} className="checkbox-item">
-                    <input 
-                      type="checkbox" 
+                        <input
+                          type="checkbox"
                       id={`alimentosEvitar-${opcion}`} 
-                      name="alimentosEvitar" 
-                      value={opcion} 
+                          name="alimentosEvitar"
+                          value={opcion}
                       checked={questionnaireData.alimentosEvitar && questionnaireData.alimentosEvitar.includes(opcion)}
-                      onChange={handleQuestionnaireChange}
-                    />
+                          onChange={handleQuestionnaireChange}
+                        />
                     <label htmlFor={`alimentosEvitar-${opcion}`}>
                       {opcion === 'lactosa' ? 'Lactosa' : 
                        opcion === 'gluten' ? 'Gluten' : 
@@ -1052,106 +1114,106 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
                        opcion === 'ninguno' ? 'Ninguno' : 
                        opcion === 'otro' ? 'Otro' : opcion}
                     </label>
-                  </div>
-                ))}
+                      </div>
+                    ))}
               </div>
               
               {questionnaireData.alimentosEvitar && 
                questionnaireData.alimentosEvitar.includes('otro') && (
                 <div className="conditional-field">
                   <label htmlFor="alimentosEvitarOtro">Por favor, especifica:</label>
-                  <input
-                    type="text"
+                        <input
+                          type="text"
                     id="alimentosEvitarOtro"
-                    name="alimentosEvitarOtro"
-                    value={questionnaireData.alimentosEvitarOtro}
-                    onChange={handleQuestionnaireChange}
+                          name="alimentosEvitarOtro"
+                          value={questionnaireData.alimentosEvitarOtro}
+                          onChange={handleQuestionnaireChange}
                     placeholder="Describe los alimentos que prefieres evitar"
-                  />
+                        />
                 </div>
-              )}
-            </div>
+                      )}
+                    </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="alimentosFavoritos">¿Qué alimentos te gustan especialmente?</label>
               <textarea
                 id="alimentosFavoritos" 
-                name="alimentosFavoritos" 
-                value={questionnaireData.alimentosFavoritos}
-                onChange={handleQuestionnaireChange}
+                      name="alimentosFavoritos"
+                      value={questionnaireData.alimentosFavoritos}
+                      onChange={handleQuestionnaireChange}
                 placeholder="Por favor, describe tus alimentos favoritos"
               ></textarea>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="consumosHabituales">¿Consumes alcohol, refrescos o ultraprocesados con frecuencia?</label>
-              <div className="checkbox-group">
-                {consumosHabitualesOpciones.map(opcion => (
+                  <div className="checkbox-group">
+                    {consumosHabitualesOpciones.map(opcion => (
                   <div key={opcion} className="checkbox-item">
-                    <input 
-                      type="checkbox" 
+                        <input
+                          type="checkbox"
                       id={`consumosHabituales-${opcion}`} 
-                      name="consumosHabituales" 
-                      value={opcion} 
+                          name="consumosHabituales"
+                          value={opcion}
                       checked={questionnaireData.consumosHabituales && questionnaireData.consumosHabituales.includes(opcion)}
-                      onChange={handleQuestionnaireChange}
-                    />
+                          onChange={handleQuestionnaireChange}
+                        />
                     <label htmlFor={`consumosHabituales-${opcion}`}>
                       {opcion === 'alcohol' ? 'Alcohol' : 
                        opcion === 'refrescos' ? 'Refrescos azucarados' : 
                        opcion === 'ultraprocesados' ? 'Ultraprocesados/snacks' : 
                        opcion === 'no_consumo' ? 'No consumo' : opcion}
                     </label>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="horasSueno">¿Cuántas horas duermes por noche?</label>
               <select 
                 id="horasSueno" 
-                name="horasSueno" 
+                      name="horasSueno"
                 value={questionnaireData.horasSueno}
-                onChange={handleQuestionnaireChange}
+                      onChange={handleQuestionnaireChange}
               >
                 <option value="menos_5">Menos de 5 horas</option>
                 <option value="5-6">Entre 5 y 6 horas</option>
                 <option value="7-8">Entre 7 y 8 horas</option>
                 <option value="mas_8">Más de 8 horas</option>
               </select>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="expectativas">¿Qué esperas conseguir con tu plan personalizado?</label>
-              <textarea 
+                    <textarea
                 id="expectativas" 
-                name="expectativas" 
-                value={questionnaireData.expectativas}
-                onChange={handleQuestionnaireChange}
+                      name="expectativas"
+                      value={questionnaireData.expectativas}
+                      onChange={handleQuestionnaireChange}
                 placeholder="Por favor, describe tus expectativas para tu plan personalizado"
               ></textarea>
-            </div>
+                  </div>
             
-            <div className="form-group">
+                <div className="form-group">
               <label htmlFor="informacionAdicional">¿Tienes alguna información adicional importante para tu plan personalizado?</label>
-              <textarea 
+                    <textarea
                 id="informacionAdicional" 
-                name="informacionAdicional" 
-                value={questionnaireData.informacionAdicional}
-                onChange={handleQuestionnaireChange}
+                      name="informacionAdicional"
+                      value={questionnaireData.informacionAdicional}
+                      onChange={handleQuestionnaireChange}
                 placeholder="Por favor, escribe cualquier información adicional importante para tu plan personalizado"
               ></textarea>
-            </div>
+                  </div>
             
-            <div className="submit-section">
+                <div className="submit-section">
               <button 
                 type="button" 
                 onClick={handleCompleteQuestionnaire} 
                 className="submit-questionnaire"
               >
                 ✨ Generar Mi Prompt Personalizado
-              </button>
+                  </button>
               {completionMessage && (
                 <div className="completion-message">
                   {completionMessage}
@@ -1159,8 +1221,8 @@ Mi edad es ${userData?.age || 'desconocida'}, mi sexo es ${userData?.sex === 'ho
               )}
             </div>
           </div>
-        </div>
-      </div>
+                </div>
+                    </div>
     </div>
   );
 }
