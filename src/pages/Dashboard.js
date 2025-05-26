@@ -354,261 +354,207 @@ function Dashboard() {
       alimentosEvitar = [], alimentosEvitarOtro, alimentosFavoritos, consumosHabituales = [],
       horasSueno, expectativas, informacionAdicional
     } = questionnaireData;
-    
-    // 1. Objetivo principal
-    let objetivoTexto = '';
-    switch(objetivoPrincipal) {
-      case 'perder_peso': objetivoTexto = 'perder peso'; break;
-      case 'ganar_musculo': objetivoTexto = 'ganar masa muscular'; break;
-      case 'mejorar_salud': objetivoTexto = 'mejorar mi salud general'; break;
-      case 'mejorar_rendimiento': objetivoTexto = 'mejorar mi rendimiento deportivo'; break;
-      case 'mantenerme': objetivoTexto = 'mantenerme en forma'; break;
-      case 'otro': objetivoTexto = objetivoOtro; break;
-      default: objetivoTexto = 'mejorar mi condición física';
-    }
-    
-    // 2. Estado de Salud
-    let condicionMedicaTexto = condicionMedica === 'no' ? 
-      'No tengo condiciones médicas relevantes' : 
-      `Tengo las siguientes condiciones médicas: ${condicionMedicaDetalle}`;
-    
-    let lesionTexto = lesion === 'no' ? 
-      'No tengo lesiones ni dolores habituales' : 
-      `Tengo las siguientes lesiones o dolores: ${lesionDetalle}`;
-    
-    // 3. Actividad Física y Estilo de Vida
-    let frecuenciaEjercicioTexto = '';
-    switch(frecuenciaEjercicio) {
-      case 'no_ejercicio': frecuenciaEjercicioTexto = 'Actualmente no hago ejercicio'; break;
-      case '1-2': frecuenciaEjercicioTexto = 'Hago ejercicio 1-2 veces por semana'; break;
-      case '3-4': frecuenciaEjercicioTexto = 'Hago ejercicio 3-4 veces por semana'; break;
-      case '5+': frecuenciaEjercicioTexto = 'Hago ejercicio 5 o más veces por semana'; break;
-      default: frecuenciaEjercicioTexto = 'Actualmente no hago ejercicio regular';
-    }
-    
-    let tiposEjercicioTexto = '';
-    if (tiposEjercicio && tiposEjercicio.length > 0) {
-      const tiposEjercicioMapeados = tiposEjercicio.map(tipo => {
+
+    // Calcular IMC
+    const imc = calculateBMI(userData?.height, userData?.weight);
+
+    // Mapear objetivo principal
+    const getObjetivoTexto = (objetivo) => {
+      switch(objetivo) {
+        case 'perder_peso': return 'Perder peso';
+        case 'ganar_musculo': return 'Aumentar masa muscular y fuerza';
+        case 'mantener_peso': return 'Mantener peso actual';
+        case 'mejorar_condicion': return 'Mejorar condición física';
+        case 'mejorar_salud': return 'Mejorar salud general';
+        case 'mejorar_rendimiento': return 'Mejorar rendimiento deportivo';
+        case 'mantenerme': return 'Mantenerme en forma';
+        case 'otro': return objetivoOtro || 'Objetivo personalizado';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear frecuencia de ejercicio
+    const getFrecuenciaTexto = (freq) => {
+      switch(freq) {
+        case 'no_ejercicio': return 'No hago ejercicio';
+        case '1-2': return '1-2 veces/semana';
+        case '3-4': return '3-4 veces/semana';
+        case '5+': return '5+ veces/semana';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear tipos de ejercicio
+    const getTiposEjercicio = () => {
+      if (!tiposEjercicio || tiposEjercicio.length === 0) return 'Ninguno';
+      
+      return tiposEjercicio.map(tipo => {
         switch(tipo) {
           case 'cardio': return 'cardio (correr, bici, nadar)';
           case 'fuerza': return 'fuerza/musculación';
           case 'yoga': return 'yoga/pilates';
           case 'deportes_equipo': return 'deportes de equipo';
-          case 'otro': return tiposEjercicioOtro;
+          case 'otro': return tiposEjercicioOtro || 'otro';
           default: return tipo;
         }
-      });
-      tiposEjercicioTexto = `Habitualmente realizo: ${tiposEjercicioMapeados.join(', ')}`;
-    } else {
-      tiposEjercicioTexto = 'No realizo ningún tipo específico de ejercicio';
-    }
-    
-    let tiempoEntrenamientoTexto = `Puedo dedicar ${
-      tiempoEntrenamiento === '15-30' ? '15-30' : 
-      tiempoEntrenamiento === '30-45' ? '30-45' : 
-      tiempoEntrenamiento === '45-60' ? '45-60' : 
-      tiempoEntrenamiento === '60-75' ? '60-75' : 
-      tiempoEntrenamiento === '75-90' ? '75-90' : 
-      tiempoEntrenamiento === '90+' ? 'más de 90' : tiempoEntrenamiento
-    } minutos a entrenar cada día`;
-    
-    let lugarEntrenamientoTexto = `Prefiero entrenar en ${
-      lugarEntrenamiento === 'casa' ? 'casa' : 
-      lugarEntrenamiento === 'gimnasio' ? 'gimnasio' : 
-      lugarEntrenamiento === 'aire_libre' ? 'aire libre' : 
-      lugarEntrenamientoOtro
-    }`;
-    
-    let materialDisponibleTexto = '';
-    if (materialDisponible && materialDisponible.includes('ninguno')) {
-      materialDisponibleTexto = 'No dispongo de material para entrenar';
-    } else if (materialDisponible && materialDisponible.length > 0) {
-      const materialMapeado = materialDisponible.map(mat => {
+      }).join(', ');
+    };
+
+    // Mapear duración de entrenamiento
+    const getDuracionTexto = (tiempo) => {
+      return tiempo ? tiempo.replace('-', '-') + ' minutos' : 'No especificado';
+    };
+
+    // Mapear lugar de entrenamiento
+    const getLugarTexto = (lugar) => {
+      switch(lugar) {
+        case 'casa': return 'Casa';
+        case 'gimnasio': return 'Gimnasio';
+        case 'aire_libre': return 'Aire libre';
+        case 'otro': return lugarEntrenamientoOtro || 'Otro';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear material disponible
+    const getMaterialTexto = () => {
+      if (!materialDisponible || materialDisponible.length === 0) return 'Ninguno';
+      if (materialDisponible.includes('ninguno')) return 'Ninguno';
+      
+      return materialDisponible.map(mat => {
         switch(mat) {
           case 'bandas': return 'bandas elásticas';
           case 'mancuernas': return 'mancuernas/pesas';
           case 'banco': return 'banco de pesas';
           case 'bicicleta': return 'bicicleta estática/elíptica';
-          case 'otro': return materialDisponibleOtro;
+          case 'otro': return materialDisponibleOtro || 'otro';
           default: return mat;
         }
-      });
-      materialDisponibleTexto = `Dispongo del siguiente material: ${materialMapeado.join(', ')}`;
-    } else {
-      materialDisponibleTexto = 'No he especificado material disponible para entrenar';
-    }
-    
-    let trabajoTexto = `Mi trabajo es principalmente ${
-      tipoTrabajo === 'sedentario' ? 'sedentario (sentado)' : 
-      tipoTrabajo === 'activo' ? 'activo (en movimiento)' : 'variado'
-    }`;
-    
-    let pasosTexto = `Doy aproximadamente ${
-      pasosDiarios === 'menos_5000' ? 'menos de 5.000' : 
-      pasosDiarios === '5000-10000' ? 'entre 5.000 y 10.000' : 'más de 10.000'
-    } pasos al día`;
-    
-    // 4. Alimentación y Hábitos
-    let alimentacionTexto = `Considero que mi alimentación actual es ${
-      alimentacionActual === 'muy_poco' ? 'muy poco saludable' : 
-      alimentacionActual === 'poco' ? 'poco saludable' : 
-      alimentacionActual === 'normal' ? 'normal' : 
-      alimentacionActual === 'bastante' ? 'bastante saludable' : 'muy saludable'
-    }`;
-    
-    let comidasTexto = `Hago ${comidasDiarias} comidas principales al día`;
-    
-    let picaTexto = `${picaEntreHoras === 'si' ? 'Suelo' : 'No suelo'} picar entre horas`;
-    
-    let comeFueraTexto = `${comeFuera === 'si' ? 'Suelo' : 'No suelo'} comer fuera de casa`;
-    
-    let restriccionesAlimentariasTexto = restriccionesAlimentarias === 'no' ? 
-      'No tengo alergias, intolerancias o restricciones alimentarias' : 
-      `Mis restricciones alimentarias son: ${restriccionesAlimentariasDetalle}`;
-    
-    let alimentosEvitarTexto = '';
-    if (alimentosEvitar && alimentosEvitar.includes('ninguno')) {
-      alimentosEvitarTexto = 'No hay alimentos específicos que prefiera evitar';
-    } else if (alimentosEvitar && alimentosEvitar.length > 0) {
-      const alimentosMapeados = alimentosEvitar.map(alimento => {
+      }).join(', ');
+    };
+
+    // Mapear tipo de trabajo
+    const getTrabajoTexto = (trabajo) => {
+      switch(trabajo) {
+        case 'sedentario': return 'Sedentario';
+        case 'activo': return 'Activo';
+        case 'variado': return 'Variado';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear pasos diarios
+    const getPasosTexto = (pasos) => {
+      switch(pasos) {
+        case 'menos_5000': return 'Menos de 5.000';
+        case '5000-10000': return '5.000-10.000';
+        case 'mas_10000': return 'Más de 10.000';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear horas de sueño
+    const getSuenoTexto = (sueno) => {
+      switch(sueno) {
+        case 'menos_5': return 'Menos de 5';
+        case '5-6': return '5-6';
+        case '7-8': return '7-8';
+        case 'mas_8': return 'Más de 8';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear alimentación actual
+    const getAlimentacionTexto = (alimentacion) => {
+      switch(alimentacion) {
+        case 'muy_poco': return 'Muy poco saludable';
+        case 'poco': return 'Poco saludable';
+        case 'normal': return 'Normal';
+        case 'bastante': return 'Bastante saludable';
+        case 'muy_saludable': return 'Muy saludable';
+        default: return 'No especificado';
+      }
+    };
+
+    // Mapear alimentos a evitar
+    const getAlimentosEvitarTexto = () => {
+      if (!alimentosEvitar || alimentosEvitar.length === 0) return 'Ninguno';
+      if (alimentosEvitar.includes('ninguno')) return 'Ninguno';
+      
+      return alimentosEvitar.map(alimento => {
         switch(alimento) {
           case 'lactosa': return 'lactosa';
           case 'gluten': return 'gluten';
           case 'frutos_secos': return 'frutos secos';
           case 'azucar': return 'azúcar';
-          case 'otro': return alimentosEvitarOtro;
+          case 'otro': return alimentosEvitarOtro || 'otro';
           default: return alimento;
         }
-      });
-      alimentosEvitarTexto = `Prefiero evitar los siguientes alimentos: ${alimentosMapeados.join(', ')}`;
-    } else {
-      alimentosEvitarTexto = 'No he especificado alimentos a evitar';
-    }
-    
-    let alimentosFavoritosTexto = alimentosFavoritos ? 
-      `Mis alimentos favoritos son: ${alimentosFavoritos}` : 
-      'No he especificado alimentos favoritos';
-    
-    let consumosTexto = '';
-    if (consumosHabituales && consumosHabituales.includes('no_consumo')) {
-      consumosTexto = 'No consumo alcohol, refrescos azucarados ni ultraprocesados con frecuencia';
-    } else if (consumosHabituales && consumosHabituales.length > 0) {
-      const consumosMapeados = consumosHabituales.map(consumo => {
+      }).join(', ');
+    };
+
+    // Mapear consumos habituales
+    const getConsumosTexto = () => {
+      if (!consumosHabituales || consumosHabituales.length === 0) return 'Ninguno';
+      if (consumosHabituales.includes('no_consumo')) return 'Ninguno';
+      
+      return consumosHabituales.map(consumo => {
         switch(consumo) {
           case 'alcohol': return 'alcohol';
           case 'refrescos': return 'refrescos azucarados';
           case 'ultraprocesados': return 'ultraprocesados/snacks';
           default: return consumo;
         }
-      });
-      consumosTexto = `Consumo con frecuencia: ${consumosMapeados.join(', ')}`;
-    } else {
-      consumosTexto = 'No he especificado consumos habituales';
+      }).join(', ');
+    };
+
+    // Crear prompt estructurado
+    let prompt = `[DATOS PERSONALES]
+- Edad: ${userData?.age || 'No especificada'}
+- Sexo: ${userData?.sex === 'hombre' ? 'Masculino' : userData?.sex === 'mujer' ? 'Femenino' : 'No especificado'}
+- Altura: ${userData?.height || 'No especificada'} cm
+- Peso: ${userData?.weight || 'No especificado'} kg
+- IMC: ${imc || 'No calculable'}
+
+[OBJETIVO]
+- Objetivo principal: ${getObjetivoTexto(objetivoPrincipal)}
+- Expectativas: ${expectativas || 'No especificadas'}
+
+[SALUD]
+- Condiciones médicas: ${condicionMedica === 'si' ? condicionMedicaDetalle : 'Ninguna'}
+- Lesiones o limitaciones: ${lesion === 'si' ? lesionDetalle : 'Ninguna'}
+
+[ACTIVIDAD FÍSICA]
+- Frecuencia de ejercicio: ${getFrecuenciaTexto(frecuenciaEjercicio)}
+- Tipos de ejercicio: ${getTiposEjercicio()}
+- Duración por sesión: ${getDuracionTexto(tiempoEntrenamiento)}
+- Lugar de entrenamiento: ${getLugarTexto(lugarEntrenamiento)}
+- Equipamiento: ${getMaterialTexto()}
+
+[ESTILO DE VIDA]
+- Trabajo: ${getTrabajoTexto(tipoTrabajo)}
+- Pasos diarios: ${getPasosTexto(pasosDiarios)}
+- Horas de sueño: ${getSuenoTexto(horasSueno)}
+
+[NUTRICIÓN]
+- Autoevaluación alimentación: ${getAlimentacionTexto(alimentacionActual)}
+- Comidas principales/día: ${comidasDiarias || 'No especificado'}
+- Picoteo entre horas: ${picaEntreHoras === 'si' ? 'Sí' : picaEntreHoras === 'no' ? 'No' : 'No especificado'}
+- Comidas fuera de casa: ${comeFuera === 'si' ? 'Sí' : comeFuera === 'no' ? 'No' : 'No especificado'}
+- Restricciones alimentarias: ${restriccionesAlimentarias === 'si' ? restriccionesAlimentariasDetalle : 'Ninguna'}
+- Alimentos a evitar: ${getAlimentosEvitarTexto()}
+- Alimentos favoritos: ${alimentosFavoritos || 'No especificados'}
+- Consumo frecuente: ${getConsumosTexto()}`;
+
+    // Solo agregar información adicional si hay contenido
+    if (informacionAdicional && informacionAdicional.trim()) {
+      prompt += `
+
+[INFORMACIÓN ADICIONAL]
+- ${informacionAdicional.trim()}`;
     }
-    
-    // 5. Preferencias y Expectativas
-    let suenoTexto = `Duermo normalmente ${
-      horasSueno === 'menos_5' ? 'menos de 5 horas' : 
-      horasSueno === '5-6' ? 'entre 5 y 6 horas' : 
-      horasSueno === '7-8' ? 'entre 7 y 8 horas' : 'más de 8 horas'
-    } por noche`;
-    
-    let expectativasTexto = expectativas ? 
-      `Lo que espero conseguir con mi plan personalizado es: ${expectativas}` : 
-      'No he especificado expectativas concretas para mi plan personalizado';
-    
-    let infoAdicionalTexto = informacionAdicional ? 
-      `Información adicional importante: ${informacionAdicional}` : 
-      '';
 
-    // Calcular IMC y categoría
-    const imc = calculateBMI(userData?.height, userData?.weight);
-    const getIMCCategory = (imc) => {
-      if (!imc) return 'No calculable';
-      const imcNum = parseFloat(imc);
-      if (imcNum < 18.5) return 'Bajo peso';
-      if (imcNum < 25) return 'Peso normal';
-      if (imcNum < 30) return 'Sobrepeso';
-      return 'Obesidad';
-    };
-
-    // Mapear objetivos con más detalle
-    const mapearObjetivo = (objetivo, otro = '') => {
-      const mapa = {
-        'perder_peso': 'perder peso y reducir grasa corporal',
-        'ganar_musculo': 'aumentar masa muscular y fuerza',
-        'mantener_peso': 'mantener mi peso actual',
-        'mejorar_condicion': 'mejorar mi condición física general',
-        'mejorar_salud': 'mejorar mi salud y bienestar general',
-        'mejorar_rendimiento': 'mejorar mi rendimiento deportivo',
-        'mantenerme': 'mantenerme en forma y activo',
-        'otro': otro
-      };
-      return mapa[objetivo] || 'mejorar mi condición física';
-    };
-
-    // Crear prompt profesional estructurado
-    return `# PERFIL COMPLETO DE CLIENTE PARA PLAN PERSONALIZADO DE FITNESS Y NUTRICIÓN
-
-## INFORMACIÓN DEMOGRÁFICA Y ANTROPOMÉTRICA
-- **Edad:** ${userData?.age || 'No especificada'} años
-- **Sexo:** ${userData?.sex === 'hombre' ? 'Masculino' : userData?.sex === 'mujer' ? 'Femenino' : 'No especificado'}
-- **Altura:** ${userData?.height || 'No especificada'} cm
-- **Peso actual:** ${userData?.weight || 'No especificado'} kg
-- **IMC:** ${imc || 'No calculable'} (${getIMCCategory(imc)})
-
-## OBJETIVO PRINCIPAL Y EXPECTATIVAS
-**Objetivo primario:** ${mapearObjetivo(objetivoPrincipal, objetivoOtro)}
-
-**Expectativas específicas:** ${expectativas || 'El cliente no ha especificado expectativas particulares, busca orientación profesional.'}
-
-## ESTADO DE SALUD Y LIMITACIONES
-**Condiciones médicas:** ${condicionMedica === 'si' ? condicionMedicaDetalle : 'Sin condiciones médicas relevantes reportadas'}
-
-**Lesiones o limitaciones físicas:** ${lesion === 'si' ? lesionDetalle : 'Sin lesiones o dolores habituales reportados'}
-
-## PERFIL DE ACTIVIDAD FÍSICA ACTUAL
-- **Nivel de actividad:** ${frecuenciaEjercicioTexto}
-- **Tipos de ejercicio practicados:** ${tiposEjercicioTexto}
-- **Tiempo disponible para entrenar:** ${tiempoEntrenamiento ? tiempoEntrenamiento.replace('-', ' a ') + ' minutos por sesión' : 'No especificado'}
-- **Lugar preferido de entrenamiento:** ${lugarEntrenamientoTexto.replace('Prefiero entrenar en ', '')}
-- **Equipamiento disponible:** ${materialDisponibleTexto.replace('Dispongo del siguiente material: ', '').replace('No dispongo de material para entrenar', 'Sin equipamiento específico')}
-
-## ESTILO DE VIDA Y ACTIVIDAD DIARIA
-- **Tipo de trabajo:** ${trabajoTexto.replace('Mi trabajo es principalmente ', '')}
-- **Actividad diaria:** ${pasosTexto.replace('Doy aproximadamente ', '')}
-- **Horas de sueño:** ${suenoTexto.replace('Duermo normalmente ', '')}
-
-## PERFIL NUTRICIONAL Y HÁBITOS ALIMENTARIOS
-- **Autoevaluación de alimentación actual:** ${alimentacionTexto.replace('Considero que mi alimentación actual es ', '')}
-- **Estructura de comidas:** ${comidasTexto}
-- **Picoteo entre comidas:** ${picaTexto}
-- **Frecuencia de comidas fuera de casa:** ${comeFueraTexto}
-- **Restricciones alimentarias:** ${restriccionesAlimentariasTexto}
-- **Alimentos a evitar:** ${alimentosEvitarTexto}
-- **Alimentos favoritos:** ${alimentosFavoritosTexto}
-- **Hábitos de consumo:** ${consumosTexto}
-
-## INFORMACIÓN ADICIONAL RELEVANTE
-${infoAdicionalTexto || 'No se ha proporcionado información adicional específica.'}
-
-## INSTRUCCIONES PARA EL PROFESIONAL/IA
-Por favor, utiliza esta información para crear un plan integral que incluya:
-
-1. **Plan de entrenamiento personalizado** adaptado al nivel actual, tiempo disponible y equipamiento
-2. **Plan nutricional específico** que considere las restricciones, preferencias y objetivos
-3. **Recomendaciones de estilo de vida** para optimizar resultados
-4. **Progresión gradual y realista** basada en el perfil actual del cliente
-5. **Consideraciones especiales** para cualquier limitación médica o física reportada
-
-**Fecha de evaluación:** ${new Date().toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })}
-
----
-*Este perfil ha sido generado automáticamente a partir de un cuestionario estructurado completado por el cliente.*`;
+    return prompt;
   };
 
   // Envía el cuestionario y guarda el prompt en la base de datos
