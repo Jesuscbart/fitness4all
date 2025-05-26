@@ -1,16 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Regla para el documento del usuario
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
 
+      // Regla para la subcolección measurements
       match /measurements/{measurementId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+      
+      // Regla para la subcolección calendars
+      match /calendars/{calendarId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Regla para la subcolección questionnaires
+      match /questionnaires/{questionnaireId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // Regla para los planes de ejercicio
+      match /exercise-plans/{planId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
-    // Puedes comentar o eliminar esta regla si no es necesaria
-    // match /weightLogs/{document=**} {
-    //   allow read, write: if request.auth != null;
-    // }
   }
 }

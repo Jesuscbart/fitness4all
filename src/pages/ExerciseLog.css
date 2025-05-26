@@ -35,7 +35,7 @@
   }
 }
 
-.loading-container {
+.exercise-log .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -43,7 +43,7 @@
   margin-top: 20px;
 }
 
-.error {
+.exercise-log .error {
   color: red;
   font-size: 0.9rem;
   font-weight: bold; 
@@ -65,7 +65,7 @@
   max-width: 1000px;
   margin: 20px auto;
   padding: 20px;
-  background-color: #fcf7de;
+  background-color: #ffffff;
   border-radius: 8px;
   text-align: left;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -89,4 +89,422 @@
 
 .exercise-plan li {
   margin: 8px 0;
+}
+
+/* Estilos para la sección del selector de cuestionarios */
+.questionnaire-selector-section {
+  max-width: 800px;
+  margin: 0 auto 40px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.questionnaire-selector-section h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.questionnaire-selector-section p {
+  color: #6c757d;
+  margin-bottom: 25px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.exercise-log .loading-message, .exercise-log .no-questionnaires {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.exercise-log .no-questionnaires {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.exercise-log .form-group {
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+  margin-bottom: 20px;
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+.exercise-log .form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.questionnaire-select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #495057;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.questionnaire-select:focus {
+  border-color: #667eea;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.questionnaire-select:hover {
+  border-color: #ced4da;
+}
+
+.generate-plan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  min-width: 250px;
+}
+
+.generate-plan-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.generate-plan-btn:disabled {
+  background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(173, 181, 189, 0.3);
+}
+
+/* Estilos para el encabezado del plan */
+.plan-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.plan-header h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.plan-header p {
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.plan-header strong {
+  color: #495057;
+}
+
+/* Estilos para el botón de envío por email y modal */
+.plan-actions {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e9ecef;
+}
+
+.email-plan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+}
+
+.email-plan-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+}
+
+.email-plan-btn:disabled {
+  background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(173, 181, 189, 0.3);
+}
+
+/* Modal de envío por email */
+.email-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 0;
+  width: 95%;
+  max-width: 600px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.email-modal .modal-header {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: white;
+  padding: 25px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.email-modal .modal-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.email-modal .close-button-modern {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.email-modal .close-button-modern:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.email-modal .close-button-modern:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-content {
+  padding: 40px;
+}
+
+.email-info h4 {
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.email-details {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.detail-item strong {
+  color: #495057;
+  font-size: 0.95rem;
+  min-width: 140px;
+}
+
+.detail-item span {
+  color: #6c757d;
+  text-align: right;
+  flex: 1;
+  margin-left: 15px;
+}
+
+.email-address {
+  color: #17a2b8 !important;
+  font-weight: 600 !important;
+  font-family: monospace;
+}
+
+.email-note {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 1px solid #90caf9;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+
+.email-note p {
+  margin: 0;
+  color: #1565c0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  padding: 12px 24px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.confirm-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(40, 167, 69, 0.3);
+  min-width: 140px;
+}
+
+.confirm-send-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.confirm-send-btn:disabled {
+  background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(173, 181, 189, 0.3);
+}
+
+/* Spinner para el estado de envío */
+.sending-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .questionnaire-selector-section {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .questionnaire-selector-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .generate-plan-btn {
+    padding: 14px 24px;
+    font-size: 1.1rem;
+    min-width: 200px;
+  }
+  
+  .exercise-log .form-group {
+    max-width: 100%;
+  }
+
+  .email-modal {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .modal-content {
+    padding: 25px;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detail-item span {
+    text-align: left;
+    margin-left: 0;
+    margin-top: 5px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
 }
