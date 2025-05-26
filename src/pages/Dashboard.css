@@ -449,6 +449,33 @@
   box-shadow: 0 4px 15px rgba(21, 87, 36, 0.1);
 }
 
+.validation-errors {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  color: #721c24;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  text-align: left;
+  border: 2px solid #f5c6cb;
+  animation: fadeIn 0.3s ease-in-out;
+  box-shadow: 0 4px 15px rgba(114, 28, 36, 0.1);
+}
+
+.validation-errors p {
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
+.validation-errors ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.validation-errors li {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .dashboard {
     padding: 15px;

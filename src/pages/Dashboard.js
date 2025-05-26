@@ -27,33 +27,33 @@ function Dashboard() {
   // Estado inicial para el cuestionario
   const initialQuestionnaireData = {
     // 1. Objetivo principal
-    objetivoPrincipal: 'perder_peso',
+    objetivoPrincipal: '',
     objetivoOtro: '',
 
     // 2. Estado de Salud
-    condicionMedica: 'no',
+    condicionMedica: '',
     condicionMedicaDetalle: '',
-    lesion: 'no',
+    lesion: '',
     lesionDetalle: '',
 
     // 3. Actividad Física y Estilo de Vida
-    frecuenciaEjercicio: 'no_ejercicio',
+    frecuenciaEjercicio: '',
     tiposEjercicio: [],
     tiposEjercicioOtro: '',
-    tiempoEntrenamiento: '30-45',
-    lugarEntrenamiento: 'casa',
+    tiempoEntrenamiento: '',
+    lugarEntrenamiento: '',
     lugarEntrenamientoOtro: '',
     materialDisponible: [],
     materialDisponibleOtro: '',
-    tipoTrabajo: 'sedentario',
-    pasosDiarios: 'menos_5000',
+    tipoTrabajo: '',
+    pasosDiarios: '',
 
     // 4. Alimentación y Hábitos
-    alimentacionActual: 'normal',
-    comidasDiarias: '3',
-    picaEntreHoras: 'no',
-    comeFuera: 'no',
-    restriccionesAlimentarias: 'no',
+    alimentacionActual: '',
+    comidasDiarias: '',
+    picaEntreHoras: '',
+    comeFuera: '',
+    restriccionesAlimentarias: '',
     restriccionesAlimentariasDetalle: '',
     alimentosEvitar: [],
     alimentosEvitarOtro: '',
@@ -61,13 +61,16 @@ function Dashboard() {
     consumosHabituales: [],
 
     // 5. Preferencias y Expectativas
-    horasSueno: '7-8',
+    horasSueno: '',
     expectativas: '',
     informacionAdicional: ''
   };
   
   // Nuevo estado para el cuestionario
   const [questionnaireData, setQuestionnaireData] = useState(initialQuestionnaireData);
+  
+  // Estado para errores de validación del cuestionario
+  const [questionnaireErrors, setQuestionnaireErrors] = useState([]);
   
   // Listas de opciones
   const tiposEjercicioOpciones = ['cardio', 'fuerza', 'yoga', 'deportes_equipo', 'otro'];
@@ -287,6 +290,56 @@ function Dashboard() {
         [name]: value
       }));
     }
+  };
+
+  // Valida que todas las preguntas obligatorias estén respondidas
+  const validateQuestionnaire = () => {
+    const errors = [];
+    const {
+      objetivoPrincipal, condicionMedica, lesion, frecuenciaEjercicio,
+      tiposEjercicio, tiempoEntrenamiento, lugarEntrenamiento,
+      materialDisponible, tipoTrabajo, pasosDiarios, alimentacionActual,
+      comidasDiarias, picaEntreHoras, comeFuera, restriccionesAlimentarias,
+      alimentosEvitar, alimentosFavoritos, consumosHabituales,
+      horasSueno, expectativas
+    } = questionnaireData;
+
+    // Validaciones de campos obligatorios
+    if (!objetivoPrincipal) errors.push('Objetivo principal');
+    if (!condicionMedica) errors.push('Condición médica');
+    if (!lesion) errors.push('Lesiones o dolores');
+    if (!frecuenciaEjercicio) errors.push('Frecuencia de ejercicio');
+    
+    // Validaciones condicionales para ejercicio
+    if (frecuenciaEjercicio && frecuenciaEjercicio !== 'no_ejercicio') {
+      if (!tiposEjercicio || tiposEjercicio.length === 0) {
+        errors.push('Tipo de ejercicio');
+      }
+      if (!tiempoEntrenamiento) errors.push('Tiempo de entrenamiento');
+    }
+    
+    if (!lugarEntrenamiento) errors.push('Lugar de entrenamiento');
+    if (!materialDisponible || materialDisponible.length === 0) {
+      errors.push('Material disponible');
+    }
+    if (!tipoTrabajo) errors.push('Tipo de trabajo');
+    if (!pasosDiarios) errors.push('Pasos diarios');
+    if (!alimentacionActual) errors.push('Alimentación actual');
+    if (!comidasDiarias) errors.push('Comidas diarias');
+    if (!picaEntreHoras) errors.push('Picar entre horas');
+    if (!comeFuera) errors.push('Comer fuera de casa');
+    if (!restriccionesAlimentarias) errors.push('Restricciones alimentarias');
+    if (!alimentosEvitar || alimentosEvitar.length === 0) {
+      errors.push('Alimentos a evitar');
+    }
+    if (!alimentosFavoritos.trim()) errors.push('Alimentos favoritos');
+    if (!consumosHabituales || consumosHabituales.length === 0) {
+      errors.push('Consumos habituales');
+    }
+    if (!horasSueno) errors.push('Horas de sueño');
+    if (!expectativas.trim()) errors.push('Expectativas');
+
+    return errors;
   };
 
   // Genera el prompt basado en el cuestionario
@@ -560,25 +613,54 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
 
   // Envía el cuestionario y guarda el prompt en la base de datos
   const handleCompleteQuestionnaire = async () => {
+    // Validar que todas las preguntas obligatorias estén respondidas
+    const validationErrors = validateQuestionnaire();
+    if (validationErrors.length > 0) {
+      setQuestionnaireErrors(validationErrors);
+      return;
+    }
+    
+    // Limpiar errores si la validación es exitosa
+    setQuestionnaireErrors([]);
+    
     try {
       const prompt = generatePrompt();
       const now = new Date();
       
-      // Formatear fecha y hora para España (UTC+2)
-      const spainTime = new Date(now.getTime() + (2 * 60 * 60 * 1000)); // +2 horas
-      const dateTimeTitle = spainTime.toLocaleString('es-ES', {
+      // Formatear fecha y hora para España
+      const formattedDateTime = now.toLocaleString('es-ES', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
         timeZone: 'Europe/Madrid'
-      }).replace(/[/:]/g, '-').replace(', ', '_');
+      });
+      
+      // Para el campo createdAt, usar la hora de España
+      const spainTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+      
+      // Crear título con el objetivo principal y fecha/hora
+      const getObjetivoTexto = (objetivo) => {
+        switch(objetivo) {
+          case 'perder_peso': return 'Perder peso';
+          case 'ganar_musculo': return 'Ganar músculo';
+          case 'mantener_peso': return 'Mantener peso actual';
+          case 'mejorar_condicion': return 'Mejorar condición física';
+          case 'mejorar_salud': return 'Mejorar salud general';
+          case 'mejorar_rendimiento': return 'Mejorar rendimiento deportivo';
+          case 'mantenerme': return 'Mantenerme en forma';
+          case 'otro': return questionnaireData.objetivoOtro || 'Objetivo personalizado';
+          default: return 'Objetivo no especificado';
+        }
+      };
+      
+      const objetivoTexto = getObjetivoTexto(questionnaireData.objetivoPrincipal);
+      const documentTitle = `${objetivoTexto} - ${formattedDateTime}`;
 
       // Mostrar el prompt en la consola
       console.log('='.repeat(80));
-      console.log('PROMPT GENERADO:', dateTimeTitle);
+      console.log('CUESTIONARIO GUARDADO:', documentTitle);
       console.log('='.repeat(80));
       console.log(prompt);
       console.log('='.repeat(80));
@@ -586,7 +668,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
       // Guardar en Firestore
       const promptDocRef = doc(collection(db, 'users', currentUser.uid, 'questionnaires'));
       await setDoc(promptDocRef, {
-        title: dateTimeTitle,
+        title: documentTitle,
         prompt: prompt,
         questionnaireData: questionnaireData,
         timestamp: Timestamp.now(),
@@ -594,7 +676,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
       });
 
       // Mostrar mensaje de confirmación
-      setCompletionMessage('¡Cuestionario completado correctamente!');
+      setCompletionMessage('¡Cuestionario guardado correctamente en la base de datos!');
       setTimeout(() => setCompletionMessage(''), 5000);
 
       // Resetear el cuestionario a valores por defecto
@@ -602,7 +684,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
 
     } catch (error) {
       console.error('Error al guardar el cuestionario:', error);
-      setCompletionMessage('Error al completar el cuestionario');
+      setCompletionMessage('Error al guardar el cuestionario en la base de datos');
       setTimeout(() => setCompletionMessage(''), 5000);
     }
   };
@@ -729,7 +811,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
                   </div>
                 <button type="submit" className="save-button">
-                  <span>💾</span> Guardar Cambios
+                  Guardar Cambios
                 </button>
               </form>
                   </div>
@@ -746,13 +828,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
           
           <div className="questionnaire-form">
             <div className="form-group">
-              <label htmlFor="objetivoPrincipal">¿Cuál es tu objetivo principal?</label>
+              <label htmlFor="objetivoPrincipal">¿Cuál es tu objetivo principal? *</label>
               <select 
                 id="objetivoPrincipal" 
                       name="objetivoPrincipal"
                 value={questionnaireData.objetivoPrincipal}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="perder_peso">Perder peso</option>
                 <option value="ganar_musculo">Ganar músculo</option>
                 <option value="mantener_peso">Mantener peso actual</option>
@@ -779,7 +862,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="condicionMedica">¿Tienes alguna condición médica relevante?</label>
+              <label htmlFor="condicionMedica">¿Tienes alguna condición médica relevante? *</label>
               <div className="description-text">(Diabetes, hipertensión, colesterol, tiroides, asma, etc.)</div>
               <select 
                 id="condicionMedica" 
@@ -787,6 +870,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 value={questionnaireData.condicionMedica}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="no">No</option>
                 <option value="si">Sí</option>
               </select>
@@ -807,13 +891,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 </div>
             
                 <div className="form-group">
-              <label htmlFor="lesion">¿Tienes alguna lesión o dolor habitual?</label>
+              <label htmlFor="lesion">¿Tienes alguna lesión o dolor habitual? *</label>
               <select 
                 id="lesion" 
                       name="lesion"
                 value={questionnaireData.lesion}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="no">No</option>
                 <option value="si">Sí</option>
               </select>
@@ -834,13 +919,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 </div>
             
                 <div className="form-group">
-              <label htmlFor="frecuenciaEjercicio">¿Cuántas veces a la semana haces ejercicio?</label>
+              <label htmlFor="frecuenciaEjercicio">¿Cuántas veces a la semana haces ejercicio? *</label>
               <select 
                 id="frecuenciaEjercicio" 
                       name="frecuenciaEjercicio"
                 value={questionnaireData.frecuenciaEjercicio}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="no_ejercicio">No hago ejercicio</option>
                 <option value="1-2">1-2 veces</option>
                 <option value="3-4">3-4 veces</option>
@@ -851,7 +937,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
             {questionnaireData.frecuenciaEjercicio !== 'no_ejercicio' && (
               <>
                 <div className="form-group">
-                  <label htmlFor="tiposEjercicio">¿Qué tipo de ejercicio haces?</label>
+                  <label htmlFor="tiposEjercicio">¿Qué tipo de ejercicio haces? *</label>
                   <div className="checkbox-group">
                     {tiposEjercicioOpciones.map(opcion => (
                       <div key={opcion} className="checkbox-item">
@@ -891,13 +977,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                     </div>
 
                 <div className="form-group">
-                  <label htmlFor="tiempoEntrenamiento">¿Cuánto tiempo puedes dedicar a entrenar cada día?</label>
+                  <label htmlFor="tiempoEntrenamiento">¿Cuánto tiempo puedes dedicar a entrenar cada día? *</label>
                   <select 
                     id="tiempoEntrenamiento" 
                       name="tiempoEntrenamiento"
                     value={questionnaireData.tiempoEntrenamiento}
                       onChange={handleQuestionnaireChange}
                   >
+                    <option value="">Selecciona una opción...</option>
                     <option value="15-30">15-30 minutos</option>
                     <option value="30-45">30-45 minutos</option>
                     <option value="45-60">45-60 minutos</option>
@@ -910,13 +997,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
             )}
             
                 <div className="form-group">
-              <label htmlFor="lugarEntrenamiento">¿Dónde prefieres entrenar?</label>
+              <label htmlFor="lugarEntrenamiento">¿Dónde prefieres entrenar? *</label>
               <select 
                 id="lugarEntrenamiento" 
                       name="lugarEntrenamiento"
                 value={questionnaireData.lugarEntrenamiento}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="casa">En casa</option>
                 <option value="gimnasio">En gimnasio</option>
                 <option value="aire_libre">En aire libre</option>
@@ -939,7 +1027,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="materialDisponible">¿Qué material tienes disponible para entrenar?</label>
+              <label htmlFor="materialDisponible">¿Qué material tienes disponible para entrenar? *</label>
                   <div className="checkbox-group">
                     {materialDisponibleOpciones.map(opcion => (
                   <div key={opcion} className="checkbox-item">
@@ -980,13 +1068,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                     </div>
             
                 <div className="form-group">
-              <label htmlFor="tipoTrabajo">¿Qué tipo de trabajo realizas?</label>
+              <label htmlFor="tipoTrabajo">¿Qué tipo de trabajo realizas? *</label>
               <select 
                 id="tipoTrabajo" 
                       name="tipoTrabajo"
                 value={questionnaireData.tipoTrabajo}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="sedentario">Sedentario (sentado)</option>
                 <option value="activo">Activo (en movimiento)</option>
                 <option value="variado">Variado</option>
@@ -994,13 +1083,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="pasosDiarios">¿Cuántos pasos das al día?</label>
+              <label htmlFor="pasosDiarios">¿Cuántos pasos das al día? *</label>
               <select 
                 id="pasosDiarios" 
                       name="pasosDiarios"
                 value={questionnaireData.pasosDiarios}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="menos_5000">Menos de 5.000</option>
                 <option value="5000-10000">Entre 5.000 y 10.000</option>
                 <option value="mas_10000">Más de 10.000</option>
@@ -1008,13 +1098,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="alimentacionActual">¿Cómo consideras tu alimentación actual?</label>
+              <label htmlFor="alimentacionActual">¿Cómo consideras tu alimentación actual? *</label>
               <select 
                 id="alimentacionActual" 
                       name="alimentacionActual"
                 value={questionnaireData.alimentacionActual}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="muy_poco">Muy poco saludable</option>
                 <option value="poco">Poco saludable</option>
                 <option value="normal">Normal</option>
@@ -1024,13 +1115,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="comidasDiarias">¿Cuántas comidas principales haces al día?</label>
+              <label htmlFor="comidasDiarias">¿Cuántas comidas principales haces al día? *</label>
               <select 
                 id="comidasDiarias" 
                       name="comidasDiarias"
                 value={questionnaireData.comidasDiarias}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="2">2 comidas</option>
                 <option value="3">3 comidas</option>
                 <option value="4">4 comidas</option>
@@ -1040,33 +1132,35 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="picaEntreHoras">¿Sueles picar entre horas?</label>
+              <label htmlFor="picaEntreHoras">¿Sueles picar entre horas? *</label>
               <select 
                 id="picaEntreHoras" 
                       name="picaEntreHoras"
                 value={questionnaireData.picaEntreHoras}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="comeFuera">¿Sueles comer fuera de casa?</label>
+              <label htmlFor="comeFuera">¿Sueles comer fuera de casa? *</label>
               <select 
                 id="comeFuera" 
                       name="comeFuera"
                 value={questionnaireData.comeFuera}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="restriccionesAlimentarias">¿Tienes alergias, intolerancias o restricciones alimentarias?</label>
+              <label htmlFor="restriccionesAlimentarias">¿Tienes alergias, intolerancias o restricciones alimentarias? *</label>
               <div className="description-text">(Alergias, vegetarianismo, veganismo, alimentos prohibidos por religión, etc.)</div>
               <select 
                 id="restriccionesAlimentarias" 
@@ -1074,6 +1168,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 value={questionnaireData.restriccionesAlimentarias}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="no">No</option>
                 <option value="si">Sí</option>
               </select>
@@ -1094,7 +1189,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 </div>
             
                 <div className="form-group">
-              <label htmlFor="alimentosEvitar">¿Qué alimentos o grupos prefieres evitar?</label>
+              <label htmlFor="alimentosEvitar">¿Qué alimentos o grupos prefieres evitar? *</label>
                   <div className="checkbox-group">
                     {alimentosEvitarOpciones.map(opcion => (
                   <div key={opcion} className="checkbox-item">
@@ -1135,7 +1230,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                     </div>
             
                 <div className="form-group">
-              <label htmlFor="alimentosFavoritos">¿Qué alimentos te gustan especialmente?</label>
+              <label htmlFor="alimentosFavoritos">¿Qué alimentos te gustan especialmente? *</label>
               <textarea
                 id="alimentosFavoritos" 
                       name="alimentosFavoritos"
@@ -1146,7 +1241,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="consumosHabituales">¿Consumes alcohol, refrescos o ultraprocesados con frecuencia?</label>
+              <label htmlFor="consumosHabituales">¿Consumes alcohol, refrescos o ultraprocesados con frecuencia? *</label>
                   <div className="checkbox-group">
                     {consumosHabitualesOpciones.map(opcion => (
                   <div key={opcion} className="checkbox-item">
@@ -1170,13 +1265,14 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 </div>
             
                 <div className="form-group">
-              <label htmlFor="horasSueno">¿Cuántas horas duermes por noche?</label>
+              <label htmlFor="horasSueno">¿Cuántas horas duermes por noche? *</label>
               <select 
                 id="horasSueno" 
                       name="horasSueno"
                 value={questionnaireData.horasSueno}
                       onChange={handleQuestionnaireChange}
               >
+                <option value="">Selecciona una opción...</option>
                 <option value="menos_5">Menos de 5 horas</option>
                 <option value="5-6">Entre 5 y 6 horas</option>
                 <option value="7-8">Entre 7 y 8 horas</option>
@@ -1185,7 +1281,7 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                   </div>
             
                 <div className="form-group">
-              <label htmlFor="expectativas">¿Qué esperas conseguir con tu plan personalizado?</label>
+              <label htmlFor="expectativas">¿Qué esperas conseguir con tu plan personalizado? *</label>
                     <textarea
                 id="expectativas" 
                       name="expectativas"
@@ -1212,8 +1308,20 @@ Por favor, utiliza esta información para crear un plan integral que incluya:
                 onClick={handleCompleteQuestionnaire} 
                 className="submit-questionnaire"
               >
-                ✨ Generar Mi Prompt Personalizado
+                Guardar Cuestionario
                   </button>
+              
+              {questionnaireErrors.length > 0 && (
+                <div className="validation-errors">
+                  <p><strong>⚠️ Faltan por responder las siguientes preguntas obligatorias:</strong></p>
+                  <ul>
+                    {questionnaireErrors.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
               {completionMessage && (
                 <div className="completion-message">
                   {completionMessage}
