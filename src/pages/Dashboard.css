@@ -288,7 +288,7 @@
   margin: 0 auto;
 }
 
-.form-group {
+.dashboard .form-group {
   margin-bottom: 30px;
   background: #e9ecef;
   padding: 25px;
@@ -297,12 +297,12 @@
   border: 2px solid transparent;
 }
 
-.form-group:hover {
+.dashboard .form-group:hover {
   border-color: #e3f2fd;
   background: #dee2e6;
 }
 
-.form-group label {
+.dashboard .form-group label {
   display: block;
   font-weight: 600;
   margin-bottom: 12px;
@@ -342,9 +342,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.form-group select, 
-.form-group input[type="text"],
-.form-group textarea {
+.dashboard .form-group select, 
+.dashboard .form-group input[type="text"],
+.dashboard .form-group textarea {
   width: 100%;
   padding: 14px 16px;
   border: 2px solid #e9ecef;
@@ -355,15 +355,15 @@
   background: white;
 }
 
-.form-group select:focus,
-.form-group input[type="text"]:focus,
-.form-group textarea:focus {
+.dashboard .form-group select:focus,
+.dashboard .form-group input[type="text"]:focus,
+.dashboard .form-group textarea:focus {
   border-color: #667eea;
   outline: 0;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-group textarea {
+.dashboard .form-group textarea {
   height: 100px;
   resize: vertical;
   font-family: inherit;
@@ -519,7 +519,7 @@
     padding: 25px;
   }
   
-  .form-group {
+  .dashboard .form-group {
     padding: 20px;
   }
   
