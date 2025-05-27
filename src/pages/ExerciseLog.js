@@ -23,6 +23,7 @@ function ExerciseLog() {
   // Estados para el modal de envío por email
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSentMessage, setEmailSentMessage] = useState('');
 
   // Cargar cuestionarios y último plan al montar el componente
   useEffect(() => {
@@ -208,9 +209,10 @@ Basa el plan únicamente en el perfil de entrenamiento del usuario:`
       const result = await sendExercisePlanEmail(emailData);
       
       if (result.success) {
-        alert(`¡Plan de entrenamiento enviado exitosamente a ${currentUser.email}!`);
         setShowEmailModal(false);
         console.log('✅ Email enviado exitosamente');
+        setEmailSentMessage('¡Plan de entrenamiento enviado exitosamente!');
+        setTimeout(() => setEmailSentMessage(''), 5000);
       } else {
         throw new Error('El servicio de email no pudo procesar la solicitud');
       }
@@ -309,6 +311,12 @@ Basa el plan únicamente en el perfil de entrenamiento del usuario:`
             >
               📧 Enviar Plan por Email
             </button>
+            
+            {emailSentMessage && (
+              <div className="email-sent-message">
+                <p>{emailSentMessage}</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -327,50 +335,38 @@ Basa el plan únicamente en el perfil de entrenamiento del usuario:`
                 <span>✕</span>
               </button>
             </div>
-            <div className="modal-content">
-              <div className="email-info">
-                <h4>¿Estás seguro que quieres enviar tu plan de entrenamiento?</h4>
-                <div className="email-details">
-                  <div className="detail-item">
-                    <strong>📧 Correo de destino:</strong>
-                    <span className="email-address">{currentUser?.email}</span>
-                  </div>
-                  <div className="detail-item">
-                    <strong>📋 Plan:</strong>
-                    <span>{currentPlanTitle || 'Plan de entrenamiento personalizado'}</span>
-                  </div>
-                  <div className="detail-item">
-                    <strong>📄 Contenido:</strong>
-                    <span>Plan de ejercicios semanal completo en formato PDF</span>
-                  </div>
+            
+            <div className="email-info">
+              <div className="email-details">
+                <div className="detail-item">
+                  <strong>Correo de destino:</strong>
+                  <span className="email-address">{currentUser?.email}</span>
                 </div>
-                <div className="email-note">
-                  <p>💡 Recibirás tu plan de entrenamiento en formato profesional, listo para imprimir o consultar desde cualquier dispositivo.</p>
+                <div className="detail-item">
+                  <strong>Plan:</strong>
+                  <span>{currentPlanTitle || 'Plan de entrenamiento personalizado'}</span>
                 </div>
               </div>
-              <div className="modal-actions">
-                <button 
-                  onClick={() => setShowEmailModal(false)}
-                  className="cancel-btn"
-                  disabled={sendingEmail}
-                >
-                  Cancelar
-                </button>
-                <button 
-                  onClick={handleSendEmailPlan}
-                  className="confirm-send-btn"
-                  disabled={sendingEmail}
-                >
-                  {sendingEmail ? (
-                    <>
-                      <div className="sending-spinner"></div>
-                      Enviando...
-                    </>
-                  ) : (
-                    '✅ Confirmar Envío'
-                  )}
-                </button>
+              <div className="email-note">
+                <p>💡 Recibirás tu plan de entrenamiento, listo para consultar desde cualquier dispositivo.</p>
               </div>
+            </div>
+            
+            <div className="modal-actions">
+              <button 
+                onClick={handleSendEmailPlan}
+                className="confirm-send-btn"
+                disabled={sendingEmail}
+              >
+                {sendingEmail ? (
+                  <>
+                    <div className="sending-spinner"></div>
+                    Enviando...
+                  </>
+                ) : (
+                  '✅ Confirmar Envío'
+                )}
+              </button>
             </div>
           </div>
         </div>

@@ -291,8 +291,11 @@
 
 .email-modal .modal-header h3 {
   margin: 0;
+  color: white;
   font-size: 1.4rem;
-  font-weight: 600;
+  text-align: center;
+  font-weight: 700;
+  flex: 1;
 }
 
 .email-modal .close-button-modern {
@@ -318,22 +321,17 @@
   cursor: not-allowed;
 }
 
-.modal-content {
+.email-info {
   padding: 40px;
-}
-
-.email-info h4 {
-  color: #2c3e50;
-  margin-bottom: 25px;
-  font-size: 1.2rem;
   text-align: center;
 }
 
 .email-details {
   background: #f8f9fa;
-  border-radius: 12px;
   padding: 20px;
+  border-radius: 8px;
   margin-bottom: 20px;
+  text-align: left;
 }
 
 .detail-item {
@@ -387,7 +385,8 @@
 .modal-actions {
   display: flex;
   gap: 15px;
-  justify-content: flex-end;
+  justify-content: center;
+  padding: 0 40px 40px 40px;
 }
 
 .cancel-btn {
@@ -506,5 +505,35 @@
 
   .modal-actions button {
     width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+/* Estilos para el mensaje de éxito del email */
+.email-sent-message {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  animation: slideInUp 0.4s ease-out;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.email-sent-message p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
