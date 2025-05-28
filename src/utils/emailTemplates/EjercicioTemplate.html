@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness4All - Tu Plan de Entrenamiento</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333333;
+        }
+        .email-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .plan-title {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .plan-content {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            line-height: 1.7;
+        }
+        /* Estilos para Markdown renderizado */
+        .plan-content h2 {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        .plan-content h3 {
+            color: #495057;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+        }
+        .plan-content ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        .plan-content li {
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+        .plan-content strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .plan-content p {
+            margin: 10px 0;
+        }
+        .tips {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f9ff 100%);
+            border-left: 4px solid #28a745;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .tips h4 {
+            color: #155724;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+        .tips ul {
+            margin: 0;
+            color: #155724;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .content, .header, .footer { padding: 20px; }
+            .plan-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🏋️ FITNESS4ALL</h1>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Tu entrenador virtual</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">¡Hola {{to_name}}! 💪</h2>
+            
+            <p>Aquí tienes tu plan de entrenamiento personalizado, diseñado específicamente para tus objetivos.</p>
+            
+            <div class="plan-title">{{plan_title}}</div>
+            
+            <div class="plan-content" id="plan-content">{{{plan_content}}}</div>
+            
+            <div class="tips">
+                <h4>💡 Consejos importantes:</h4>
+                <ul>
+                    <li><strong>Calentamiento:</strong> Siempre realízalo antes de entrenar</li>
+                    <li><strong>Hidratación:</strong> Mantente bien hidratado durante el ejercicio</li>
+                    <li><strong>Descanso:</strong> Respeta los días de recuperación</li>
+                    <li><strong>Escucha tu cuerpo:</strong> Si sientes dolor, para y consulta un profesional</li>
+                </ul>
+            </div>
+            
+            <p style="text-align: center; margin-top: 30px; color: #667eea; font-weight: 600; font-size: 16px;">
+                ¡A por todas! 🚀
+            </p>
+        </div>
+        
+        <div class="footer">
+            <strong>Fitness4All</strong> - Entrenamiento Personalizado con IA<br>
+            © 2024 Todos los derechos reservados
+        </div>
+    </div>
+
+    <script>
+        // Script para procesar Markdown a HTML
+        document.addEventListener('DOMContentLoaded', function() {
+            const planContent = document.getElementById('plan-content');
+            let content = planContent.innerHTML;
+            
+            // Convertir encabezados ## -> h2, ### -> h3
+            content = content.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            content = content.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            
+            // Convertir texto en negrita **texto** -> <strong>texto</strong>
+            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convertir listas - item -> <li>item</li>
+            content = content.replace(/^- (.*$)/gim, '<li>$1</li>');
+            
+            // Envolver listas en <ul>
+            content = content.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+            
+            // Convertir saltos de línea
+            content = content.replace(/\n/g, '<br>');
+            
+            planContent.innerHTML = content;
+        });
+    </script>
+</body>
+</html> 

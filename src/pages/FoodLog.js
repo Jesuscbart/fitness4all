@@ -123,22 +123,22 @@ function FoodLog() {
 - **[Nombre del plato/comida]**
   - [Ingrediente 1]: [cantidad]
   - [Ingrediente 2]: [cantidad]
+  - **Macros:** [proteínas, carbohidratos, grasas]
   - **Preparación:** [instrucciones breves]
-  - **Alternativa:** [opción de sustitución]
 
 ### Comida
 - **[Nombre del plato/comida]**
   - [Ingrediente 1]: [cantidad]
   - [Ingrediente 2]: [cantidad]
+  - **Macros:** [proteínas, carbohidratos, grasas]
   - **Preparación:** [instrucciones breves]
-  - **Alternativa:** [opción de sustitución]
 
 ### Cena
 - **[Nombre del plato/comida]**
   - [Ingrediente 1]: [cantidad]
   - [Ingrediente 2]: [cantidad]
+  - **Macros:** [proteínas, carbohidratos, grasas]
   - **Preparación:** [instrucciones breves]
-  - **Alternativa:** [opción de sustitución]
 
 ### Snacks
 - **Media mañana:** [snack saludable]
@@ -152,7 +152,6 @@ function FoodLog() {
 - Respetar restricciones alimentarias y preferencias del usuario
 - Incluir exactamente los 7 días de la semana (Lunes a Domingo)
 - Proporcionar cantidades específicas y realistas
-- Incluir alternativas para ingredientes principales
 - Mantener consistencia en el formato
 - Comenzar directamente con "## Lunes" sin texto previo
 - Asegurar variedad en los menús a lo largo de la semana

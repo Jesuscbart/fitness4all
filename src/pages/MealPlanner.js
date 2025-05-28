@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import './MealPlanner.css';
 import { AuthContext } from '../contexts/AuthContext';
 import { db } from '../firebaseConfig';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
 
 function MealPlanner() {
   const { currentUser } = useContext(AuthContext);
@@ -12,6 +12,7 @@ function MealPlanner() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mealTitle, setMealTitle] = useState('');
   const [mealIngredients, setMealIngredients] = useState('');
+  const [mealMacros, setMealMacros] = useState('');
   const [meals, setMeals] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
@@ -48,10 +49,16 @@ function MealPlanner() {
   // Obtiene el plan de comidas guardado en Firestore
   const fetchSavedMealPlan = async () => {
     try {
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists() && userDoc.data().mealPlan) {
-        setSavedMealPlan(userDoc.data().mealPlan);
+      // Buscar en la nueva colección nutrition-plans en lugar del documento del usuario
+      const nutritionPlansRef = collection(db, 'users', currentUser.uid, 'nutrition-plans');
+      const q = query(nutritionPlansRef, orderBy('createdAt', 'desc'), limit(1));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const lastPlan = querySnapshot.docs[0].data();
+        setSavedMealPlan(lastPlan.plan);
+      } else {
+        setSavedMealPlan('');
       }
     } catch (error) {
       console.error('Error al obtener el plan de comidas:', error);
@@ -172,6 +179,7 @@ function MealPlanner() {
     
     setMealTitle(mealData ? mealData.title : '');
     setMealIngredients(mealData ? mealData.ingredients : '');
+    setMealMacros(mealData ? mealData.macros : '');
     setIsModalOpen(true);
   };
 
@@ -181,6 +189,7 @@ function MealPlanner() {
     setSelectedMeal(null);
     setMealTitle('');
     setMealIngredients('');
+    setMealMacros('');
   };
 
   // Formatea el tipo de comida para mostrar en español
@@ -216,7 +225,8 @@ function MealPlanner() {
       
       updatedMeals[day][selectedMeal.mealType] = {
         title: mealTitle,
-        ingredients: mealIngredients
+        ingredients: mealIngredients,
+        macros: mealMacros
       };
       
       // Guardar en Firebase
@@ -355,47 +365,68 @@ function MealPlanner() {
           messages: [
             {
               role: 'system',
-              content: `Eres un asistente especializado en procesamiento de datos. Tu tarea es convertir un plan de comidas en formato Markdown a un formato JSON estructurado para un calendario MENSUAL.
+              content: `Eres un asistente especializado en procesamiento de datos nutricionales. Tu tarea es convertir un plan de comidas en formato Markdown estructurado a un formato JSON para un calendario MENSUAL.
 
               A continuación te proporciono un mapeo de los días del mes ${selectedMonthName} de ${selectedYear} con su día de la semana correspondiente:
               ${JSON.stringify(daysMapping, null, 2)}
               
               Por ejemplo, en este mes, los días ${daysMapping["Lunes"].join(", ")} son lunes.
               
-              Tu tarea es asignar cada comida del plan al día EXACTO que corresponde según el día de la semana mencionado en el plan.
+              El plan de entrada tiene la siguiente estructura por día:
+              ## [Día de la semana]
+              ### Desayuno
+              - **[Nombre del plato]**
+              - [Ingrediente]: [cantidad]
+              - [Ingrediente]: [cantidad]
+              - **Macros:** [proteínas, carbohidratos, grasas]
+              - **Preparación:** [instrucciones]
               
-              Por ejemplo:
-              - Si el plan menciona "Lunes: Huevos revueltos", debes asignar esta comida a TODOS los días que son lunes (${daysMapping["Lunes"].join(", ")}).
-              - Si menciona "Fin de semana" o específicamente "Sábado"/"Domingo", debes asignar esas comidas solo a los días que son sábado (${daysMapping["Sabado"].join(", ")}) o domingo (${daysMapping["Domingo"].join(", ")}).
+              ### Comida / ### Cena
+              [Misma estructura que desayuno]
               
-              El formato de salida debe ser un objeto JSON donde cada clave es el número del día del mes, y cada valor es un objeto con tres propiedades: breakfast, lunch y dinner.
+              ### Snacks
+              - **Media mañana:** [snack]
+              - **Media tarde:** [snack]
               
-              Cada comida debe tener dos propiedades: "title" (nombre de la comida) y "ingredients" (lista de ingredientes separados por comas).
+              ### Hidratación
+              - **Agua:** [cantidad]
               
-              Ejemplo del formato esperado:
+              Tu tarea es:
+              1. Identificar cada día de la semana mencionado en el plan (Lunes, Martes, etc.)
+              2. Extraer el nombre del plato principal para breakfast, lunch y dinner
+              3. Extraer los ingredientes CON sus cantidades exactas
+              4. Extraer la información de macros (proteínas, carbohidratos, grasas)
+              5. Asignar cada comida a TODOS los días del mes que corresponden a ese día de la semana
+              
+              REGLAS IMPORTANTES:
+              - Para el título: usa solo el nombre del plato que está después de los asteriscos **
+              - Para los ingredientes: incluye cada ingrediente con su cantidad exacta, separados por comas
+              - Para los macros: extrae exactamente la información que aparece después de "**Macros:**"
+              - NO incluyas información de preparación o hidratación
+              - Asigna las comidas a TODOS los días del mes que sean del mismo día de la semana
+              
+              Ejemplo de salida esperada:
               {
                 "1": {
                   "breakfast": {
-                    "title": "Tortilla de claras y espinacas",
-                    "ingredients": "4 claras de huevo, 1 huevo entero, 1 taza de espinacas, 1 aguacate pequeño"
+                    "title": "Tortilla de claras con avena y plátano",
+                    "ingredients": "Claras de huevo: 5 unidades, Avena integral: 50 g, Plátano: 1 mediano (120 g)",
+                    "macros": "35 g proteínas, 55 g carbohidratos, 8 g grasas"
                   },
                   "lunch": {
-                    "title": "Quinoa con pechuga de pollo",
-                    "ingredients": "150g pechuga de pollo, 1 taza de quinoa, 1 taza de verduras al vapor"
+                    "title": "Pasta integral con pechuga de pollo y verduras",
+                    "ingredients": "Pasta integral: 80 g (peso seco), Pechuga de pollo: 150 g, Brócoli: 100 g, Aceite de oliva: 1 cucharada (10 ml)",
+                    "macros": "45 g proteínas, 60 g carbohidratos, 12 g grasas"
                   },
                   "dinner": {
-                    "title": "Pescado al horno con espárragos",
-                    "ingredients": "200g de tilapia, 1 taza de espárragos, 1/2 taza de arroz integral"
+                    "title": "Ensalada de atún con quinoa y aguacate",
+                    "ingredients": "Atún en agua: 120 g, Quinoa cocida: 70 g, Aguacate: 50 g, Tomate cherry: 50 g",
+                    "macros": "35 g proteínas, 30 g carbohidratos, 15 g grasas"
                   }
-                },
-                "2": {
-                  ... comidas para el día 2 ...
                 }
               }
               
-              IMPORTANTE: Lee cuidadosamente el plan de comidas para identificar si especifica días de la semana (Lunes, Martes, etc.) o categorías como "Días laborables" y "Fin de semana". Asigna las comidas EXACTAMENTE a los días correspondientes.
-              
-              IMPORTANTE: Proporciona solo el JSON en tu respuesta, sin etiquetas markdown como \`\`\`json o \`\`\`, sin comentarios ni texto adicional.`
+              IMPORTANTE: Proporciona SOLAMENTE el JSON válido en tu respuesta, sin etiquetas markdown como \`\`\`json o \`\`\`, sin comentarios ni texto adicional.`
             },
             {
               role: 'user',
@@ -641,7 +672,7 @@ ${savedMealPlan}`
                               <span className="meal-title">{getMealData(day, 'breakfast').title}</span>
                             </div>
                           ) : (
-                            <span className="meal-icon">🍳</span>
+                            <span className="meal-icon">🥐</span>
                           )}
                         </div>
                       </div>
@@ -652,7 +683,7 @@ ${savedMealPlan}`
                               <span className="meal-title">{getMealData(day, 'lunch').title}</span>
                             </div>
                           ) : (
-                            <span className="meal-icon">🍲</span>
+                            <span className="meal-icon">🥗</span>
                           )}
                         </div>
                       </div>
@@ -663,7 +694,7 @@ ${savedMealPlan}`
                               <span className="meal-title">{getMealData(day, 'dinner').title}</span>
                             </div>
                           ) : (
-                            <span className="meal-icon">🍽️</span>
+                            <span className="meal-icon">🌙</span>
                           )}
                         </div>
                       </div>
@@ -705,6 +736,14 @@ ${savedMealPlan}`
                   placeholder="Ej: 200g de lechuga, 100g de tomate..."
                   value={mealIngredients}
                   onChange={(e) => setMealIngredients(e.target.value)}
+                ></textarea>
+              </div>
+              <div className="form-group">
+                <label>Macros:</label>
+                <textarea 
+                  placeholder="Ej: 35 g proteínas, 55 g carbohidratos, 8 g grasas"
+                  value={mealMacros}
+                  onChange={(e) => setMealMacros(e.target.value)}
                 ></textarea>
               </div>
               <div className="form-actions">
