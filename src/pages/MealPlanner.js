@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import './MealPlanner.css';
 import { AuthContext } from '../contexts/AuthContext';
 import { db } from '../firebaseConfig';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
+import ReactMarkdown from 'react-markdown';
 
 function MealPlanner() {
   const { currentUser } = useContext(AuthContext);
@@ -12,6 +13,7 @@ function MealPlanner() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mealTitle, setMealTitle] = useState('');
   const [mealIngredients, setMealIngredients] = useState('');
+  const [mealMacros, setMealMacros] = useState('');
   const [meals, setMeals] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingAI, setIsProcessingAI] = useState(false);
@@ -21,6 +23,19 @@ function MealPlanner() {
   const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
   const [weeksInMonth, setWeeksInMonth] = useState([]); // Array con los números de semana del mes
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Estado para el modal de confirmación
+  
+  // Estados para la lista de la compra
+  const [selectedWeekForShopping, setSelectedWeekForShopping] = useState(1); // Semana seleccionada para la lista
+  const [numberOfPeople, setNumberOfPeople] = useState(1); // Número de personas
+  const [shoppingList, setShoppingList] = useState(''); // Lista de la compra generada
+  const [isGeneratingList, setIsGeneratingList] = useState(false); // Estado de carga para la generación
+  const [shoppingMessage, setShoppingMessage] = useState(''); // Mensaje de estado para la lista
+  
+  // Estados para el modal de envío por email de la lista de compra
+  const [showEmailShoppingModal, setShowEmailShoppingModal] = useState(false);
+  const [sendingShoppingEmail, setSendingShoppingEmail] = useState(false);
+  const [shoppingEmailSentMessage, setShoppingEmailSentMessage] = useState('');
+  const [shoppingListTitle, setShoppingListTitle] = useState(''); // Título dinámico de la lista
   
   // Nombres de los meses en español
   const monthNames = [
@@ -48,10 +63,16 @@ function MealPlanner() {
   // Obtiene el plan de comidas guardado en Firestore
   const fetchSavedMealPlan = async () => {
     try {
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists() && userDoc.data().mealPlan) {
-        setSavedMealPlan(userDoc.data().mealPlan);
+      // Buscar en la nueva colección nutrition-plans en lugar del documento del usuario
+      const nutritionPlansRef = collection(db, 'users', currentUser.uid, 'nutrition-plans');
+      const q = query(nutritionPlansRef, orderBy('createdAt', 'desc'), limit(1));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const lastPlan = querySnapshot.docs[0].data();
+        setSavedMealPlan(lastPlan.plan);
+      } else {
+        setSavedMealPlan('');
       }
     } catch (error) {
       console.error('Error al obtener el plan de comidas:', error);
@@ -172,6 +193,7 @@ function MealPlanner() {
     
     setMealTitle(mealData ? mealData.title : '');
     setMealIngredients(mealData ? mealData.ingredients : '');
+    setMealMacros(mealData ? mealData.macros : '');
     setIsModalOpen(true);
   };
 
@@ -181,6 +203,7 @@ function MealPlanner() {
     setSelectedMeal(null);
     setMealTitle('');
     setMealIngredients('');
+    setMealMacros('');
   };
 
   // Formatea el tipo de comida para mostrar en español
@@ -216,7 +239,8 @@ function MealPlanner() {
       
       updatedMeals[day][selectedMeal.mealType] = {
         title: mealTitle,
-        ingredients: mealIngredients
+        ingredients: mealIngredients,
+        macros: mealMacros
       };
       
       // Guardar en Firebase
@@ -355,47 +379,68 @@ function MealPlanner() {
           messages: [
             {
               role: 'system',
-              content: `Eres un asistente especializado en procesamiento de datos. Tu tarea es convertir un plan de comidas en formato Markdown a un formato JSON estructurado para un calendario MENSUAL.
+              content: `Eres un asistente especializado en procesamiento de datos nutricionales. Tu tarea es convertir un plan de comidas en formato Markdown estructurado a un formato JSON para un calendario MENSUAL.
 
               A continuación te proporciono un mapeo de los días del mes ${selectedMonthName} de ${selectedYear} con su día de la semana correspondiente:
               ${JSON.stringify(daysMapping, null, 2)}
               
               Por ejemplo, en este mes, los días ${daysMapping["Lunes"].join(", ")} son lunes.
               
-              Tu tarea es asignar cada comida del plan al día EXACTO que corresponde según el día de la semana mencionado en el plan.
+              El plan de entrada tiene la siguiente estructura por día:
+              ## [Día de la semana]
+              ### Desayuno
+              - **[Nombre del plato]**
+              - [Ingrediente]: [cantidad]
+              - [Ingrediente]: [cantidad]
+              - **Macros:** [proteínas, carbohidratos, grasas]
+              - **Preparación:** [instrucciones]
               
-              Por ejemplo:
-              - Si el plan menciona "Lunes: Huevos revueltos", debes asignar esta comida a TODOS los días que son lunes (${daysMapping["Lunes"].join(", ")}).
-              - Si menciona "Fin de semana" o específicamente "Sábado"/"Domingo", debes asignar esas comidas solo a los días que son sábado (${daysMapping["Sabado"].join(", ")}) o domingo (${daysMapping["Domingo"].join(", ")}).
+              ### Comida / ### Cena
+              [Misma estructura que desayuno]
               
-              El formato de salida debe ser un objeto JSON donde cada clave es el número del día del mes, y cada valor es un objeto con tres propiedades: breakfast, lunch y dinner.
+              ### Snacks
+              - **Media mañana:** [snack]
+              - **Media tarde:** [snack]
               
-              Cada comida debe tener dos propiedades: "title" (nombre de la comida) y "ingredients" (lista de ingredientes separados por comas).
+              ### Hidratación
+              - **Agua:** [cantidad]
               
-              Ejemplo del formato esperado:
+              Tu tarea es:
+              1. Identificar cada día de la semana mencionado en el plan (Lunes, Martes, etc.)
+              2. Extraer el nombre del plato principal para breakfast, lunch y dinner
+              3. Extraer los ingredientes CON sus cantidades exactas
+              4. Extraer la información de macros (proteínas, carbohidratos, grasas)
+              5. Asignar cada comida a TODOS los días del mes que corresponden a ese día de la semana
+              
+              REGLAS IMPORTANTES:
+              - Para el título: usa solo el nombre del plato que está después de los asteriscos **
+              - Para los ingredientes: incluye cada ingrediente con su cantidad exacta, separados por comas
+              - Para los macros: extrae exactamente la información que aparece después de "**Macros:**"
+              - NO incluyas información de preparación o hidratación
+              - Asigna las comidas a TODOS los días del mes que sean del mismo día de la semana
+              
+              Ejemplo de salida esperada:
               {
                 "1": {
                   "breakfast": {
-                    "title": "Tortilla de claras y espinacas",
-                    "ingredients": "4 claras de huevo, 1 huevo entero, 1 taza de espinacas, 1 aguacate pequeño"
+                    "title": "Tortilla de claras con avena y plátano",
+                    "ingredients": "Claras de huevo: 5 unidades, Avena integral: 50 g, Plátano: 1 mediano (120 g)",
+                    "macros": "35 g proteínas, 55 g carbohidratos, 8 g grasas"
                   },
                   "lunch": {
-                    "title": "Quinoa con pechuga de pollo",
-                    "ingredients": "150g pechuga de pollo, 1 taza de quinoa, 1 taza de verduras al vapor"
+                    "title": "Pasta integral con pechuga de pollo y verduras",
+                    "ingredients": "Pasta integral: 80 g (peso seco), Pechuga de pollo: 150 g, Brócoli: 100 g, Aceite de oliva: 1 cucharada (10 ml)",
+                    "macros": "45 g proteínas, 60 g carbohidratos, 12 g grasas"
                   },
                   "dinner": {
-                    "title": "Pescado al horno con espárragos",
-                    "ingredients": "200g de tilapia, 1 taza de espárragos, 1/2 taza de arroz integral"
+                    "title": "Ensalada de atún con quinoa y aguacate",
+                    "ingredients": "Atún en agua: 120 g, Quinoa cocida: 70 g, Aguacate: 50 g, Tomate cherry: 50 g",
+                    "macros": "35 g proteínas, 30 g carbohidratos, 15 g grasas"
                   }
-                },
-                "2": {
-                  ... comidas para el día 2 ...
                 }
               }
               
-              IMPORTANTE: Lee cuidadosamente el plan de comidas para identificar si especifica días de la semana (Lunes, Martes, etc.) o categorías como "Días laborables" y "Fin de semana". Asigna las comidas EXACTAMENTE a los días correspondientes.
-              
-              IMPORTANTE: Proporciona solo el JSON en tu respuesta, sin etiquetas markdown como \`\`\`json o \`\`\`, sin comentarios ni texto adicional.`
+              IMPORTANTE: Proporciona SOLAMENTE el JSON válido en tu respuesta, sin etiquetas markdown como \`\`\`json o \`\`\`, sin comentarios ni texto adicional.`
             },
             {
               role: 'user',
@@ -562,6 +607,194 @@ ${savedMealPlan}`
     setIsConfirmModalOpen(false);
   };
 
+  // Función para generar la lista de la compra con IA
+  const generateShoppingList = async () => {
+    if (!selectedWeekForShopping || numberOfPeople < 1) {
+      setShoppingMessage('Por favor, selecciona una semana válida y un número de personas mayor a 0');
+      setTimeout(() => setShoppingMessage(''), 3000);
+      return;
+    }
+
+    setIsGeneratingList(true);
+    setShoppingMessage('');
+    
+    try {
+      // Obtener los días de la semana seleccionada
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      // Calcular los días que pertenecen a la semana seleccionada
+      const daysInSelectedWeek = [];
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const weekOfMonth = getWeekOfMonth(date);
+        
+        if (weekOfMonth === selectedWeekForShopping) {
+          daysInSelectedWeek.push(day);
+        }
+      }
+      
+      // Recopilar todas las comidas de esa semana
+      const weekMeals = [];
+      daysInSelectedWeek.forEach(day => {
+        const dayKey = day.toString();
+        if (meals[dayKey]) {
+          const dayOfWeek = new Date(year, month, day).toLocaleDateString('es-ES', { weekday: 'long' });
+          
+          Object.entries(meals[dayKey]).forEach(([mealType, mealData]) => {
+            const mealTypeName = mealType === 'breakfast' ? 'Desayuno' : 
+                                mealType === 'lunch' ? 'Comida' : 
+                                mealType === 'dinner' ? 'Cena' : mealType;
+            
+            weekMeals.push({
+              day: dayOfWeek,
+              mealType: mealTypeName,
+              title: mealData.title,
+              ingredients: mealData.ingredients
+            });
+          });
+        }
+      });
+      
+      if (weekMeals.length === 0) {
+        setShoppingMessage('No hay comidas planificadas para la semana seleccionada');
+        setTimeout(() => setShoppingMessage(''), 3000);
+        return;
+      }
+      
+      // Crear el prompt para la IA
+      const mealsText = weekMeals.map(meal => 
+        `${meal.day} - ${meal.mealType}: ${meal.title}\nIngredientes: ${meal.ingredients}`
+      ).join('\n\n');
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-mini',
+          temperature: 0.1,
+          messages: [
+            {
+              role: 'system',
+              content: `Eres un asistente especializado en crear listas de la compra inteligentes. Tu tarea es analizar los menús de una semana hechos para 1 persona y generar una lista de compra optimizada.
+
+**INSTRUCCIONES:**
+- Analiza todos los ingredientes de las comidas de la semana
+- Agrupa ingredientes similares (ej: si hay tomate en varias recetas, súmalos)
+- Ajusta las cantidades según el número de personas
+- Organiza la lista por categorías de supermercado
+- Incluye cantidades específicas y realistas
+- Considera ingredientes básicos que podrían faltar (aceite, sal, especias básicas)
+
+**FORMATO DE SALIDA:**
+Organiza la lista usando estas categorías en este orden:
+🥬 **VERDURAS Y HORTALIZAS**
+🍎 **FRUTAS**
+🥩 **CARNES Y PESCADOS**
+🥛 **LÁCTEOS Y HUEVOS**
+🍞 **PANADERÍA Y CEREALES**
+🥫 **CONSERVAS Y ENLATADOS**
+🧂 **CONDIMENTOS Y ESPECIAS**
+❄️ **CONGELADOS**
+🧴 **OTROS**
+
+**REGLAS:**
+- Usa viñetas (-) para cada elemento
+- Especifica cantidades realistas (gramos, unidades, litros, etc.)
+- No incluyas ingredientes que normalmente se tienen en casa (como sal común)
+- Agrupa cantidades si el mismo ingrediente aparece en varias recetas
+- Sé específico pero práctico en las cantidades`
+            },
+            {
+              role: 'user',
+              content: `Número de personas: ${numberOfPeople}
+
+Menús de la semana:
+${mealsText}
+
+Crea una lista de la compra organizada y optimizada para ${numberOfPeople} persona${numberOfPeople > 1 ? 's' : ''}.`
+            }
+          ]
+        })
+      });
+      
+      const data = await response.json();
+      const generatedList = data.choices[0].message.content;
+      
+      setShoppingList(generatedList);
+      setShoppingMessage('¡Lista de la compra generada correctamente!');
+      setTimeout(() => setShoppingMessage(''), 3000);
+      
+      // Generar título dinámico
+      const monthName = monthNames[currentDate.getMonth()];
+      const currentYear = currentDate.getFullYear();
+      const dynamicTitle = `Lista de la compra de la semana ${selectedWeekForShopping} del mes de ${monthName} ${currentYear}`;
+      setShoppingListTitle(dynamicTitle);
+      
+      console.log('='.repeat(80));
+      console.log(`LISTA DE LA COMPRA - Semana ${selectedWeekForShopping} - ${numberOfPeople} persona${numberOfPeople > 1 ? 's' : ''}`);
+      console.log('='.repeat(80));
+      console.log(generatedList);
+      console.log('='.repeat(80));
+      
+    } catch (error) {
+      console.error('Error al generar la lista de la compra:', error);
+      setShoppingMessage('Error al generar la lista de la compra. Por favor, inténtalo de nuevo.');
+      setTimeout(() => setShoppingMessage(''), 3000);
+    } finally {
+      setIsGeneratingList(false);
+    }
+  };
+
+  // Función para enviar la lista de compra por email
+  const handleSendShoppingListEmail = async () => {
+    if (!shoppingList || !currentUser) {
+      alert('No hay lista de compra para enviar o usuario no autenticado.');
+      return;
+    }
+
+    setSendingShoppingEmail(true);
+    try {
+      const monthName = monthNames[currentDate.getMonth()];
+      const emailYear = currentDate.getFullYear();
+      const weekInfo = `Semana ${selectedWeekForShopping} del mes de ${monthName} ${emailYear}`;
+      
+      const emailData = {
+        to: currentUser.email,
+        subject: `Tu Lista de la Compra - ${weekInfo}`,
+        listContent: shoppingList,
+        listTitle: shoppingListTitle || `Lista de la compra - ${weekInfo}`,
+        weekInfo: weekInfo,
+        peopleCount: `${numberOfPeople} persona${numberOfPeople > 1 ? 's' : ''}`,
+        userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Usuario'
+      };
+
+      // Llamada al servicio de email (necesitamos importarlo)
+      const { sendShoppingListEmail } = await import('../utils/emailService');
+      const result = await sendShoppingListEmail(emailData);
+      
+      if (result.success) {
+        setShowEmailShoppingModal(false);
+        console.log('✅ Email de lista de compra enviado exitosamente');
+        setShoppingEmailSentMessage('¡Lista de compra enviada exitosamente!');
+        setTimeout(() => setShoppingEmailSentMessage(''), 5000);
+      } else {
+        throw new Error('El servicio de email no pudo procesar la solicitud');
+      }
+      
+    } catch (error) {
+      console.error('Error al enviar el email de lista de compra:', error);
+      alert('Error al enviar la lista por correo electrónico. Por favor, inténtalo de nuevo.');
+    } finally {
+      setSendingShoppingEmail(false);
+    }
+  };
+
   return (
     <div className="meal-planner">
       <h1>Planificador de Comidas</h1>
@@ -641,7 +874,7 @@ ${savedMealPlan}`
                               <span className="meal-title">{getMealData(day, 'breakfast').title}</span>
                             </div>
                           ) : (
-                            <span className="meal-icon">🍳</span>
+                            <span className="meal-icon">🥐</span>
                           )}
                         </div>
                       </div>
@@ -652,7 +885,7 @@ ${savedMealPlan}`
                               <span className="meal-title">{getMealData(day, 'lunch').title}</span>
                             </div>
                           ) : (
-                            <span className="meal-icon">🍲</span>
+                            <span className="meal-icon">🥗</span>
                           )}
                         </div>
                       </div>
@@ -663,7 +896,7 @@ ${savedMealPlan}`
                               <span className="meal-title">{getMealData(day, 'dinner').title}</span>
                             </div>
                           ) : (
-                            <span className="meal-icon">🍽️</span>
+                            <span className="meal-icon">🌙</span>
                           )}
                         </div>
                       </div>
@@ -681,6 +914,88 @@ ${savedMealPlan}`
         <button className="clear-month-button" onClick={openConfirmModal}>
           🗑️ Vaciar mes actual
         </button>
+      </div>
+
+      <div className="shopping-list-section">
+        <h2>🛒 Lista de la Compra</h2>
+        <p>Genera tu lista de la compra basada en el menú de una semana específica</p>
+        
+        <div className="shopping-controls">
+          <div className="form-group">
+            <label htmlFor="week-selector">Selecciona la semana:</label>
+            <select 
+              id="week-selector"
+              value={selectedWeekForShopping}
+              onChange={(e) => setSelectedWeekForShopping(parseInt(e.target.value))}
+              className="week-selector"
+            >
+              {weeksInMonth.map(week => (
+                <option key={week} value={week}>
+                  Semana {week} {isCurrentMonth() && week === currentWeek ? '(actual)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="people-number">Número de personas:</label>
+            <input
+              type="number"
+              id="people-number"
+              min="1"
+              max="20"
+              value={numberOfPeople}
+              onChange={(e) => setNumberOfPeople(parseInt(e.target.value) || 1)}
+              className="people-input"
+            />
+          </div>
+          
+          <button 
+            onClick={generateShoppingList}
+            disabled={isGeneratingList || weeksInMonth.length === 0}
+            className="generate-shopping-btn"
+          >
+            {isGeneratingList ? (
+              <>
+                <div className="loading-spinner"></div>
+                Generando lista...
+              </>
+            ) : (
+              '🛒 Generar Lista de la Compra'
+            )}
+          </button>
+        </div>
+        
+        {shoppingMessage && (
+          <div className={`shopping-message ${shoppingMessage.includes('Error') ? 'error' : 'success'}`}>
+            {shoppingMessage}
+          </div>
+        )}
+        
+        {shoppingList && (
+          <div className="shopping-list-result">
+            <h3>{shoppingListTitle || 'Tu Lista de la Compra'}</h3>
+            <div className="shopping-list-content">
+              <ReactMarkdown>{shoppingList}</ReactMarkdown>
+            </div>
+            
+            <div className="email-shopping-actions">
+              <button 
+                onClick={() => setShowEmailShoppingModal(true)}
+                className="email-shopping-btn"
+                disabled={sendingShoppingEmail}
+              >
+                📧 Enviar Lista por Email
+              </button>
+              
+              {shoppingEmailSentMessage && (
+                <div className="shopping-message success" style={{marginTop: '10px'}}>
+                  {shoppingEmailSentMessage}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal de edición de comida */}
@@ -707,6 +1022,14 @@ ${savedMealPlan}`
                   onChange={(e) => setMealIngredients(e.target.value)}
                 ></textarea>
               </div>
+              <div className="form-group">
+                <label>Macros:</label>
+                <textarea 
+                  placeholder="Ej: 35 g proteínas, 55 g carbohidratos, 8 g grasas"
+                  value={mealMacros}
+                  onChange={(e) => setMealMacros(e.target.value)}
+                ></textarea>
+              </div>
               <div className="form-actions">
                 <button className="delete-button" onClick={deleteMeal}>Eliminar</button>
                 <button className="save-button" onClick={saveMeal}>Guardar</button>
@@ -726,6 +1049,61 @@ ${savedMealPlan}`
             <div className="confirmation-buttons">
               <button className="cancel-button" onClick={closeConfirmModal}>Cancelar</button>
               <button className="confirm-button" onClick={clearCurrentMonth}>Eliminar todo</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para envío por email de lista de compra */}
+      {showEmailShoppingModal && (
+        <div className="modal-overlay">
+          <div className="email-modal">
+            <div className="modal-header">
+              <h3>📧 Enviar Lista de Compra por Email</h3>
+              <button 
+                className="close-button-modern" 
+                onClick={() => setShowEmailShoppingModal(false)}
+                disabled={sendingShoppingEmail}
+              >
+                <span>✕</span>
+              </button>
+            </div>
+            
+            <div className="email-info">
+              <div className="email-details">
+                <div className="detail-item">
+                  <strong>Correo de destino:</strong>
+                  <span className="email-address">{currentUser?.email}</span>
+                </div>
+                <div className="detail-item">
+                  <strong>Lista:</strong>
+                  <span>{shoppingListTitle || 'Lista de la compra'}</span>
+                </div>
+                <div className="detail-item">
+                  <strong>Personas:</strong>
+                  <span>{numberOfPeople} persona{numberOfPeople > 1 ? 's' : ''}</span>
+                </div>
+              </div>
+              <div className="email-note">
+                <p>🛒 Recibirás tu lista de compra organizada por categorías para facilitar tu visita al supermercado.</p>
+              </div>
+            </div>
+            
+            <div className="modal-actions">
+              <button 
+                onClick={handleSendShoppingListEmail}
+                className="confirm-send-btn"
+                disabled={sendingShoppingEmail}
+              >
+                {sendingShoppingEmail ? (
+                  <>
+                    <div className="sending-spinner"></div>
+                    Enviando...
+                  </>
+                ) : (
+                  '✅ Confirmar Envío'
+                )}
+              </button>
             </div>
           </div>
         </div>

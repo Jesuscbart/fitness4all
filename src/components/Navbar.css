@@ -1,0 +1,112 @@
+nav {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+nav li {
+  margin: 0;
+}
+
+nav a,
+nav button {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 18px 24px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  font-family: inherit;
+}
+
+/* Efecto hover */
+nav a:hover,
+nav button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* Efecto activo */
+nav a:active,
+nav button:active {
+  transform: translateY(0);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+nav button {
+  margin-left: 10px;
+  border-radius: 4px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    min-height: auto;
+    padding: 10px 0;
+  }
+  
+  nav li {
+    width: 100%;
+    text-align: center;
+  }
+  
+  nav a,
+  nav button {
+    padding: 12px 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  nav button {
+    margin-left: 0;
+    margin-top: 5px;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  nav a,
+  nav button {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+}
+
+/* Animación de entrada suave */
+nav {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} 
