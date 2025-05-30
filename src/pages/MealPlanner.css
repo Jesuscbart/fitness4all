@@ -331,134 +331,30 @@
   }
 }
 
-/* Añadir estos estilos a tu archivo MealPlanner.css */
-
+/* Indicador de carga */
 .loading {
   text-align: center;
   padding: 20px;
   font-size: 18px;
+  color: #5a6c7d;
 }
 
-.meal-info {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 5px;
-  word-break: break-word;
-}
-
-.meal-title {
-  font-size: 0.85rem;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Estilos compartidos para mantener el ancho uniforme y centrado */
-.ai-import-section,
-.weeks-selection {
-  width: 100%;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-}
-
-.ai-import-button {
-  display: block;
-  width: 100%;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-  text-align: center;
-}
-
-.ai-import-button:hover {
-  background-color: #45a049;
-}
-
-.ai-import-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
+/* Spinner para botones */
 .loading-spinner {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255,255,255,.3);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #4CAF50;
-  animation: spin 1s ease-in-out infinite;
+  border-top: 2px solid white;
+  animation: simpleSpin 1s linear infinite;
+  margin-right: 8px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Estilos para la selección de semanas */
-.weeks-selection {
-  padding: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-.weeks-selection p {
-  margin: 0 0 10px 0;
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-}
-
-.weeks-checkboxes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.week-checkbox-label {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.week-checkbox-label:hover {
-  background-color: #e3e3e3;
-}
-
-.week-checkbox-label input {
-  margin-right: 5px;
-}
-
-/* Ajustes responsivos para la selección de semanas */
-@media (max-width: 576px) {
-  .weeks-checkboxes {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .week-checkbox-label {
-    width: 100%;
-  }
+/* Animación */
+@keyframes simpleSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Estilos para la semana actual */
@@ -895,4 +791,112 @@
   to { transform: rotate(360deg); }
 }
 
-/* Modal de confirmación - Estilos simplificados */ 
+/* Modal de confirmación */ 
+
+.meal-info {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  word-break: break-word;
+}
+
+.meal-title {
+  font-size: 0.85rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Estilos compartidos para mantener el ancho uniforme y centrado */
+.ai-import-section,
+.weeks-selection {
+  width: 100%;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.ai-import-button {
+  display: block;
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  text-align: center;
+}
+
+.ai-import-button:hover {
+  background-color: #45a049;
+}
+
+.ai-import-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Estilos para la selección de semanas */
+.weeks-selection {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.weeks-selection p {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+.weeks-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.week-checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.week-checkbox-label:hover {
+  background-color: #e3e3e3;
+}
+
+.week-checkbox-label input {
+  margin-right: 5px;
+}
+
+/* Ajustes responsivos para la selección de semanas */
+@media (max-width: 576px) {
+  .weeks-checkboxes {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .week-checkbox-label {
+    width: 100%;
+  }
+}

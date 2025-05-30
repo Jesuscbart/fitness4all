@@ -48,6 +48,34 @@ nav button:hover {
   transform: translateY(-1px);
 }
 
+/* Estilo para el enlace activo (página actual) */
+nav a.active {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+  position: relative;
+}
+
+/* Subrayado para el enlace activo */
+nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Efecto hover para enlaces activos */
+nav a.active:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
 /* Efecto activo */
 nav a:active,
 nav button:active {
@@ -84,6 +112,12 @@ nav button {
     margin-left: 0;
     margin-top: 5px;
     border-radius: 0;
+  }
+  
+  /* Ajustar el subrayado en móviles */
+  nav a.active::after {
+    width: 80%;
+    height: 2px;
   }
 }
 
