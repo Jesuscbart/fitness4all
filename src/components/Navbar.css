@@ -1,6 +1,6 @@
+/* Navbar principal */
 nav {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -16,13 +16,13 @@ nav ul {
   align-items: center;
   min-height: 60px;
   flex-wrap: wrap;
-  gap: 0;
 }
 
 nav li {
   margin: 0;
 }
 
+/* Estilos para enlaces y botones */
 nav a,
 nav button {
   display: block;
@@ -35,7 +35,6 @@ nav button {
   border: none;
   background: none;
   cursor: pointer;
-  position: relative;
   font-family: inherit;
 }
 
@@ -43,20 +42,17 @@ nav button {
 nav a:hover,
 nav button:hover {
   background-color: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  text-decoration: none;
   transform: translateY(-1px);
 }
 
-/* Estilo para el enlace activo (página actual) */
+/* Enlace activo (página actual) */
 nav a.active {
   background-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
   font-weight: 600;
   position: relative;
 }
 
-/* Subrayado para el enlace activo */
+/* Subrayado para enlace activo */
 nav a.active::after {
   content: '';
   position: absolute;
@@ -67,28 +63,14 @@ nav a.active::after {
   height: 3px;
   background-color: #ffffff;
   border-radius: 2px;
-  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-/* Efecto hover para enlaces activos */
+/* Hover en enlace activo */
 nav a.active:hover {
   background-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
 }
 
-/* Efecto activo */
-nav a:active,
-nav button:active {
-  transform: translateY(0);
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-nav button {
-  margin-left: 10px;
-  border-radius: 4px;
-}
-
-/* Responsive design */
+/* Responsive para móviles */
 @media (max-width: 768px) {
   nav ul {
     flex-direction: column;
@@ -108,13 +90,7 @@ nav button {
     box-sizing: border-box;
   }
   
-  nav button {
-    margin-left: 0;
-    margin-top: 5px;
-    border-radius: 0;
-  }
-  
-  /* Ajustar el subrayado en móviles */
+  /* Subrayado más ancho en móviles */
   nav a.active::after {
     width: 80%;
     height: 2px;

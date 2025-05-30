@@ -12,13 +12,13 @@ code {
     monospace;
 }
 
+/* Mensajes de error y éxito */
 .error {
   color: red;
   font-size: 0.8rem;
   font-weight: bold; 
   margin-top: 2px;
   margin-bottom: 0;
-  text-align: left;
 }
 
 .success {
@@ -26,9 +26,9 @@ code {
   font-size: 0.9rem;
   font-weight: bold; 
   margin-top: 5px;
-  text-align: left;
 }
 
+/* Formulario principal */
 .complete-profile-form {
   display: flex;
   flex-direction: column;
@@ -46,12 +46,12 @@ code {
   margin-bottom: 20px;
   font-size: 1.8rem;
   text-align: center;
-  width: 100%;
 }
 
-.complete-profile-form div {
+/* Campos del formulario */
+.form-field {
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
 }
 
 .complete-profile-form label {
@@ -82,18 +82,12 @@ code {
   color: #adb5bd;
 }
 
-.form-field {
-  width: 100%;
-  margin-bottom: 15px;
-}
-
+/* Radio buttons para sexo */
 .radio-container {
   display: flex;
   justify-content: center;
   gap: 30px;
   margin-top: 10px;
-  margin-bottom: 5px;
-  width: 100%;
 }
 
 .radio-option {
@@ -109,11 +103,11 @@ code {
   height: 0;
 }
 
-.radio-option label.radio-label {
+.radio-option .radio-label {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0px;
+  padding: 10px 0;
   cursor: pointer;
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -125,23 +119,30 @@ code {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
-.radio-option label.radio-label::before {
-  display: none;
-}
-
-.radio-option input[type="radio"]:checked + label.radio-label {
+.radio-option input[type="radio"]:checked + .radio-label {
   background-color: #e6f2ff;
   border-color: #007bff;
   color: #007bff;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
 }
 
-.radio-option:hover label.radio-label {
+.radio-option:hover .radio-label {
   background-color: #e9ecef;
 }
 
+.gender-icon {
+  font-size: 32px;
+  margin-bottom: 5px;
+  color: #6c757d;
+  transition: color 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label .gender-icon {
+  color: #007bff;
+}
+
+/* Botón de envío */
 .complete-profile-form button {
-  display: block;
   width: 60%;
   padding: 12px;
   background-color: #007bff;
@@ -163,6 +164,7 @@ code {
   background-color: #0062cc;
 }
 
+/* Responsive */
 @media (max-width: 576px) {
   .complete-profile-form {
     padding: 20px;
@@ -173,17 +175,4 @@ code {
     flex-direction: column;
     gap: 15px;
   }
-}
-
-.gender-icon {
-  font-size: 32px;
-  margin-bottom: 5px;
-  font-weight: normal;
-  line-height: 1;
-  color: #6c757d;
-  transition: all 0.3s ease;
-}
-
-.radio-option input[type="radio"]:checked + label.radio-label .gender-icon {
-  color: #007bff;
 }

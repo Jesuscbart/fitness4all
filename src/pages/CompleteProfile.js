@@ -6,7 +6,7 @@ import { db } from '../firebaseConfig';
 import './CompleteProfile.css';
 
 function CompleteProfile() {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, refreshUserData } = useContext(AuthContext);
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
@@ -95,9 +95,14 @@ function CompleteProfile() {
 
       console.log('Perfil actualizado');
       setUpdateMessage('Perfil actualizado con éxito');
-      navigate('/');
+      
+      // Actualizar el contexto para reflejar que el perfil está completo
+      await refreshUserData();
+      
+      // La redirección será manejada automáticamente por PrivateRoute cuando isProfileComplete cambie a true
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
+      setUpdateMessage('Error al actualizar el perfil. Por favor, inténtalo de nuevo.');
     }
   };
 
