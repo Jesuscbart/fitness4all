@@ -42,8 +42,31 @@ function Login() {
 
   return (
     <div className="login-container">
-      <h2>Iniciar Sesión</h2>
-      <button onClick={handleGoogleSignIn}>Iniciar sesión con Google</button>
+      <div className="login-card">
+        <div className="app-logo">
+          <h1>FITNESS4ALL</h1>
+        </div>
+        
+        <h2>Iniciar Sesión</h2>
+        <p className="login-subtitle">
+          Accede a tu entrenador personal con IA y comienza tu transformación
+        </p>
+        
+        <button className="google-signin-btn" onClick={handleGoogleSignIn}>
+          Iniciar sesión con Google
+        </button>
+        
+        <div className="features-list">
+          <h4>¿Qué encontrarás en Fitness4All?</h4>
+          <ul>
+            <li>Planes de entrenamiento personalizados</li>
+            <li>Menús nutricionales adaptados a ti</li>
+            <li>Seguimiento de tu progreso</li>
+            <li>Listas de compra inteligentes</li>
+            <li>Recomendaciones con IA avanzada</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { doc, updateDoc, collection, setDoc, Timestamp } from 'firebase/firestore';
 import { AuthContext } from '../contexts/AuthContext';
 import { db } from '../firebaseConfig';
+import './CompleteProfile.css';
 
 function CompleteProfile() {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, refreshUserData } = useContext(AuthContext);
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
+  const [sex, setSex] = useState('hombre');
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
   const [updateMessage, setUpdateMessage] = useState('');
@@ -80,7 +82,8 @@ function CompleteProfile() {
       await updateDoc(userDocRef, {
         age,
         height,
-        weight
+        weight,
+        sex
       });
 
       const measurementDocRef = doc(collection(db, 'users', currentUser.uid, 'measurements'));
@@ -92,25 +95,32 @@ function CompleteProfile() {
 
       console.log('Perfil actualizado');
       setUpdateMessage('Perfil actualizado con éxito');
-      navigate('/');
+      
+      // Actualizar el contexto para reflejar que el perfil está completo
+      await refreshUserData();
+      
+      // La redirección será manejada automáticamente por PrivateRoute cuando isProfileComplete cambie a true
     } catch (error) {
       console.error('Error al actualizar el perfil:', error);
+      setUpdateMessage('Error al actualizar el perfil. Por favor, inténtalo de nuevo.');
     }
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div className="loading-container">Cargando...</div>;
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="complete-profile-form">
       <h2>Completa tu perfil</h2>
-      <div>
+      
+      <div className="form-field">
         <label htmlFor="age">Edad:</label>
         <input
           type="number"
+          id="age"
           name="age"
-          placeholder="Edad"
+          placeholder="Introduce tu edad"
           value={age}
           onChange={(e) => setAge(e.target.value)}
           onBlur={handleBlur}
@@ -119,12 +129,49 @@ function CompleteProfile() {
         />
         {errors.age && <p className="error">{errors.age}</p>}
       </div>
-      <div>
+      
+      <div className="form-field">
+        <label>Sexo:</label>
+        <div className="radio-container">
+          <div className="radio-option">
+            <input
+              type="radio"
+              id="sexo-hombre"
+              name="sex"
+              value="hombre"
+              checked={sex === 'hombre'}
+              onChange={(e) => setSex(e.target.value)}
+            />
+            <label htmlFor="sexo-hombre" className="radio-label">
+              <span className="gender-icon">♂</span>
+              Hombre
+            </label>
+          </div>
+          
+          <div className="radio-option">
+            <input
+              type="radio"
+              id="sexo-mujer"
+              name="sex"
+              value="mujer"
+              checked={sex === 'mujer'}
+              onChange={(e) => setSex(e.target.value)}
+            />
+            <label htmlFor="sexo-mujer" className="radio-label">
+              <span className="gender-icon">♀</span>
+              Mujer
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div className="form-field">
         <label htmlFor="height">Altura (cm):</label>
         <input
           type="number"
+          id="height"
           name="height"
-          placeholder="Altura (cm)"
+          placeholder="Introduce tu altura en cm"
           value={height}
           onChange={(e) => setHeight(e.target.value)}
           onBlur={handleBlur}
@@ -133,12 +180,14 @@ function CompleteProfile() {
         />
         {errors.height && <p className="error">{errors.height}</p>}
       </div>
-      <div>
+      
+      <div className="form-field">
         <label htmlFor="weight">Peso (kg):</label>
         <input
           type="number"
+          id="weight"
           name="weight"
-          placeholder="Peso (kg)"
+          placeholder="Introduce tu peso en kg"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           onBlur={handleBlur}
@@ -147,6 +196,7 @@ function CompleteProfile() {
         />
         {errors.weight && <p className="error">{errors.weight}</p>}
       </div>
+      
       <button type="submit">Guardar</button>
       {updateMessage && <p className="success">{updateMessage}</p>}
     </form>

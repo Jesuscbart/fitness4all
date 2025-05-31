@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Lista de la Compra Inteligente - Fitness4All</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333333;
+        }
+        .email-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #fd7e14 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .list-title {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .shopping-info {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8d1 100%);
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .shopping-info h4 {
+            margin: 0 0 12px 0;
+            color: #856404;
+            font-weight: 600;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .info-item strong {
+            color: #856404;
+            margin-right: 8px;
+        }
+        .list-content {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            line-height: 1.7;
+        }
+        /* Estilos para la lista de compra */
+        .list-content h2 {
+            color: #ff6b35;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ff6b35;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .list-content h3 {
+            color: #fd7e14;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+        }
+        .list-content ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        .list-content li {
+            margin: 8px 0;
+            line-height: 1.5;
+            list-style-type: disc;
+        }
+        .list-content strong {
+            color: #ff6b35;
+            font-weight: 600;
+        }
+        .list-content p {
+            margin: 10px 0;
+        }
+        .shopping-tips {
+            background: linear-gradient(135deg, #fff8f3 0%, #ffe8d1 100%);
+            border-left: 4px solid #ff6b35;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .shopping-tips h4 {
+            color: #e55a2b;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .shopping-tips ul {
+            margin: 0;
+            color: #e55a2b;
+            padding-left: 20px;
+        }
+        .shopping-tips li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .footer strong {
+            color: #ff6b35;
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .content, .header, .footer { padding: 20px; }
+            .list-content { padding: 20px; }
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>🛒 FITNESS4ALL</h1>
+            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Tu asistente de compras inteligente</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="color: #ff6b35; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                ¡Hola {{to_name}}!
+            </h2>
+            
+            <p>Aquí tienes tu lista de la compra, organizada por categorías para que tu visita al supermercado sea más eficiente y rápida.</p>
+            
+            <div class="shopping-info">
+                <h4>Información de tu compra</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>📅 Semana:</strong> {{week_info}}
+                    </div>
+                    <div class="info-item">
+                        <strong>👥 Nº Personas:</strong> {{people_count}}
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Generado:</strong> {{generated_date}}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-title">{{list_title}}</div>
+            
+            <div class="list-content" id="list-content">{{{list_content}}}</div>
+            
+            <p style="text-align: center; margin-top: 30px; color: #ff6b35; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                🌟 ¡Disfruta de tu compra inteligente y saludable!
+            </p>
+        </div>
+        
+        <div class="footer">
+            <strong>Fitness4All</strong> - Compras Inteligentes con IA<br>
+            © 2024 Todos los derechos reservados
+        </div>
+    </div>
+
+    <script>
+        // Script para procesar Markdown a HTML - similar a DietaTemplate.html
+        document.addEventListener('DOMContentLoaded', function() {
+            const listContent = document.getElementById('list-content');
+            let content = listContent.innerHTML;
+            
+            // Convertir encabezados ## -> h2
+            content = content.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            
+            // Convertir texto en negrita **texto** -> <strong>texto</strong>
+            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convertir listas - item -> <li>item</li>
+            content = content.replace(/^- (.*$)/gim, '<li>$1</li>');
+            
+            // Envolver elementos li consecutivos en ul
+            content = content.replace(/(<li>.*?<\/li>\s*)+/gs, '<ul>$&</ul>');
+            
+            // Convertir saltos de línea
+            content = content.replace(/\n/g, '<br>');
+            
+            listContent.innerHTML = content;
+        });
+    </script>
+</body>
+</html> 
