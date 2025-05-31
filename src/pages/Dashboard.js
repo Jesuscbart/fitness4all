@@ -1,17 +1,13 @@
-// Ejemplo en Dashboard.js
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { db } from '../firebaseConfig';
-import { doc, getDoc, updateDoc, Timestamp, collection, setDoc } from 'firebase/firestore';
-import { Line } from 'react-chartjs-2';
-import { query, where, getDocs } from 'firebase/firestore';
-import './Dashboard.css'; // Importar los estilos del modal
-import ReactMarkdown from 'react-markdown';
+import { doc, updateDoc, Timestamp, collection, setDoc } from 'firebase/firestore';
+import { query, getDocs } from 'firebase/firestore';
+import './Dashboard.css';
 
 function Dashboard() {
-  const { currentUser } = useContext(AuthContext);
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { currentUser, userData, refreshUserData } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false); // false ya que el AuthContext maneja la carga
   const [formData, setFormData] = useState({
     age: '',
     height: '',
@@ -86,29 +82,6 @@ function Dashboard() {
     }
     return null;
   };
-
-  // Obtiene los datos del usuario desde Firestore
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!currentUser) {
-        console.error('Usuario no autenticado');
-        return;
-      }
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        setUserData(userDoc.data());
-      } else {
-        console.log('Usuario no encontrado en Firestore');
-      }
-      setLoading(false);
-    };
-
-    if (currentUser) {
-      fetchUserData();
-    }
-  }, [currentUser]);
 
   // Obtiene el historial de peso del usuario
   const fetchWeightData = async () => {
@@ -229,8 +202,9 @@ function Dashboard() {
         height: formData.height
       });
 
-      const updatedUserDoc = await getDoc(userDocRef);
-      setUserData(updatedUserDoc.data());
+      // Actualizar los datos del usuario en el contexto
+      await refreshUserData();
+      
       setUpdateMessage('¡Datos actualizados correctamente!');
       setTimeout(() => setUpdateMessage(''), 3000);
       fetchWeightData(); // Actualiza el historial de peso

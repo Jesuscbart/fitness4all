@@ -1,3 +1,4 @@
+/* Dashboard principal */
 .dashboard {
   padding: 20px;
   min-height: 100vh;
@@ -13,6 +14,7 @@
   color: #007bff;
 }
 
+/* Header */
 .dashboard-header {
   text-align: center;
   margin-bottom: 40px;
@@ -31,9 +33,9 @@
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.6;
-  font-weight: 400;
 }
 
+/* Contenido principal */
 .dashboard-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -43,18 +45,14 @@
   margin-bottom: 40px;
 }
 
+/* Tarjeta de estadísticas del usuario */
 .user-stats-card {
   background: white;
   border-radius: 16px;
   padding: 30px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
   max-width: 600px;
   margin: 0 auto;
-}
-
-.user-stats-card:hover {
-  transform: translateY(-5px);
 }
 
 .user-stats-card h3 {
@@ -91,6 +89,7 @@
   color: #2c3e50;
 }
 
+/* Botón actualizar datos */
 .update-data-btn {
   display: flex;
   align-items: center;
@@ -126,7 +125,7 @@
   border: 1px solid #c3e6cb;
 }
 
-/* Modal moderno */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -216,7 +215,6 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
   width: 100%;
-  min-height: 48px;
 }
 
 .input-group input:focus {
@@ -288,21 +286,20 @@
   margin: 0 auto;
 }
 
-.dashboard .form-group {
+.form-group {
   margin-bottom: 30px;
-  background: #e9ecef;
+  background: #f8f9fa;
   padding: 25px;
   border-radius: 12px;
-  transition: all 0.3s ease;
   border: 2px solid transparent;
 }
 
-.dashboard .form-group:hover {
+.form-group:hover {
   border-color: #e3f2fd;
-  background: #dee2e6;
+  background: #f1f3f4;
 }
 
-.dashboard .form-group label {
+.form-group label {
   display: block;
   font-weight: 600;
   margin-bottom: 12px;
@@ -315,19 +312,14 @@
   color: #6c757d;
   margin-bottom: 15px;
   font-style: italic;
-  padding: 0;
-  background: transparent;
-  border: none;
 }
 
 .conditional-field {
   margin-top: 20px;
-  margin-left: 0;
   padding: 15px;
   background: white;
   border-radius: 8px;
   border: 2px solid #e9ecef;
-  animation: fadeIn 0.3s ease-in-out;
 }
 
 .conditional-field label {
@@ -337,33 +329,28 @@
   margin-bottom: 8px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.dashboard .form-group select, 
-.dashboard .form-group input[type="text"],
-.dashboard .form-group textarea {
+.form-group select,
+.form-group input[type="text"],
+.form-group textarea {
   width: 100%;
   padding: 14px 16px;
   border: 2px solid #e9ecef;
   border-radius: 8px;
   font-size: 1rem;
   color: #495057;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease;
   background: white;
 }
 
-.dashboard .form-group select:focus,
-.dashboard .form-group input[type="text"]:focus,
-.dashboard .form-group textarea:focus {
+.form-group select:focus,
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
   border-color: #667eea;
   outline: 0;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.dashboard .form-group textarea {
+.form-group textarea {
   height: 100px;
   resize: vertical;
   font-family: inherit;
@@ -408,6 +395,7 @@
   color: #495057;
 }
 
+/* Envío del cuestionario */
 .submit-section {
   text-align: center;
   margin-top: 40px;
@@ -445,7 +433,6 @@
   text-align: center;
   font-weight: 600;
   border: 2px solid #c3e6cb;
-  animation: fadeIn 0.3s ease-in-out;
   box-shadow: 0 4px 15px rgba(21, 87, 36, 0.1);
 }
 
@@ -457,7 +444,6 @@
   margin-top: 20px;
   text-align: left;
   border: 2px solid #f5c6cb;
-  animation: fadeIn 0.3s ease-in-out;
   box-shadow: 0 4px 15px rgba(114, 28, 36, 0.1);
 }
 
@@ -476,6 +462,7 @@
   font-weight: 500;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .dashboard {
     padding: 15px;
@@ -502,15 +489,6 @@
     gap: 15px;
   }
   
-  .input-group {
-    width: 100%;
-  }
-  
-  .input-group input {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
   .checkbox-group {
     grid-template-columns: 1fr;
   }
@@ -519,7 +497,7 @@
     padding: 25px;
   }
   
-  .dashboard .form-group {
+  .form-group {
     padding: 20px;
   }
   

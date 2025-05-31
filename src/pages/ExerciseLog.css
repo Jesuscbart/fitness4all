@@ -1,10 +1,22 @@
-/* Estilos para el spinner */
+/* Contenedor principal */
+.exercise-log {
+  padding: 20px;
+  text-align: center;
+}
+
+.exercise-log h1 {
+  color: #000000;
+  margin-bottom: 30px;
+}
+
+/* Spinner de carga */
 .lds-ring {
   display: inline-block;
   position: relative;
   width: 64px;
   height: 64px;
 }
+
 .lds-ring div {
   box-sizing: border-box;
   display: block;
@@ -17,25 +29,17 @@
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: #007bff transparent transparent transparent;
 }
-.lds-ring div:nth-child(1) {
-  animation-delay: -0.45s;
-}
-.lds-ring div:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.lds-ring div:nth-child(3) {
-  animation-delay: -0.15s;
-}
+
+.lds-ring div:nth-child(1) { animation-delay: -0.45s; }
+.lds-ring div:nth-child(2) { animation-delay: -0.3s; }
+.lds-ring div:nth-child(3) { animation-delay: -0.15s; }
+
 @keyframes lds-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.exercise-log .loading-container {
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -43,55 +47,7 @@
   margin-top: 20px;
 }
 
-.exercise-log .error {
-  color: red;
-  font-size: 0.9rem;
-  font-weight: bold; 
-  margin-top: 5px;
-  text-align: left;
-}
-
-.exercise-log {
-  padding: 20px;
-  text-align: center;
-}
-
-.exercise-log h1 {
-  color: #000000;
-  margin-bottom: 30px;
-}
-
-.exercise-plan {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  text-align: left;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.exercise-plan h1 {
-  color: #007bff;
-  margin-bottom: 30px;
-}
-
-.exercise-plan h2 {
-  color: #0056b3;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 10px;
-  margin-top: 20px;
-}
-
-.exercise-plan ul {
-  padding-left: 20px;
-}
-
-.exercise-plan li {
-  margin: 8px 0;
-}
-
-/* Estilos para la sección del selector de cuestionarios */
+/* Sección selector de cuestionarios */
 .questionnaire-selector-section {
   max-width: 800px;
   margin: 0 auto 40px auto;
@@ -116,7 +72,7 @@
   line-height: 1.6;
 }
 
-.exercise-log .loading-message, .exercise-log .no-questionnaires {
+.loading-message, .no-questionnaires {
   padding: 20px;
   background: #f8f9fa;
   border-radius: 10px;
@@ -124,7 +80,7 @@
   font-style: italic;
 }
 
-.exercise-log .no-questionnaires {
+.no-questionnaires {
   background: #fff3cd;
   color: #856404;
   border: 1px solid #ffeaa7;
@@ -137,17 +93,14 @@
   align-items: center;
 }
 
-.exercise-log .form-group {
+.form-group {
   width: 100%;
   max-width: 500px;
   text-align: left;
   margin-bottom: 20px;
-  background: transparent;
-  padding: 0;
-  border: none;
 }
 
-.exercise-log .form-group label {
+.form-group label {
   display: block;
   font-weight: 600;
   margin-bottom: 10px;
@@ -171,10 +124,6 @@
   border-color: #667eea;
   outline: 0;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.questionnaire-select:hover {
-  border-color: #ced4da;
 }
 
 .generate-plan-btn {
@@ -207,7 +156,37 @@
   box-shadow: 0 2px 8px rgba(173, 181, 189, 0.3);
 }
 
-/* Estilos para el encabezado del plan */
+/* Plan de ejercicios */
+.exercise-plan {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.exercise-plan h1 {
+  color: #007bff;
+  margin-bottom: 30px;
+}
+
+.exercise-plan h2 {
+  color: #0056b3;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+  margin-top: 20px;
+}
+
+.exercise-plan ul {
+  padding-left: 20px;
+}
+
+.exercise-plan li {
+  margin: 8px 0;
+}
+
 .plan-header {
   text-align: center;
   margin-bottom: 30px;
@@ -228,11 +207,6 @@
   margin: 0;
 }
 
-.plan-header strong {
-  color: #495057;
-}
-
-/* Estilos para el botón de envío por email y modal */
 .plan-actions {
   text-align: center;
   margin-top: 30px;
@@ -269,7 +243,37 @@
   box-shadow: 0 2px 8px rgba(173, 181, 189, 0.3);
 }
 
-/* Modal de envío por email */
+.email-sent-message {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.email-sent-message p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
 .email-modal {
   background: white;
   border-radius: 20px;
@@ -280,7 +284,7 @@
   overflow: hidden;
 }
 
-.email-modal .modal-header {
+.modal-header {
   background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
   color: white;
   padding: 25px 40px;
@@ -289,7 +293,7 @@
   align-items: center;
 }
 
-.email-modal .modal-header h3 {
+.modal-header h3 {
   margin: 0;
   color: white;
   font-size: 1.4rem;
@@ -298,7 +302,7 @@
   flex: 1;
 }
 
-.email-modal .close-button-modern {
+.close-button-modern {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
@@ -312,11 +316,11 @@
   transition: background 0.3s ease;
 }
 
-.email-modal .close-button-modern:hover:not(:disabled) {
+.close-button-modern:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.email-modal .close-button-modern:disabled {
+.close-button-modern:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -389,29 +393,6 @@
   padding: 0 40px 40px 40px;
 }
 
-.cancel-btn {
-  padding: 12px 24px;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.cancel-btn:hover:not(:disabled) {
-  background: #5a6268;
-  transform: translateY(-1px);
-}
-
-.cancel-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
 .confirm-send-btn {
   display: flex;
   align-items: center;
@@ -443,7 +424,6 @@
   box-shadow: 0 2px 8px rgba(173, 181, 189, 0.3);
 }
 
-/* Spinner para el estado de envío */
 .sending-spinner {
   width: 16px;
   height: 16px;
@@ -458,7 +438,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .questionnaire-selector-section {
     padding: 20px;
@@ -475,17 +455,13 @@
     min-width: 200px;
   }
   
-  .exercise-log .form-group {
+  .form-group {
     max-width: 100%;
   }
 
   .email-modal {
     margin: 10px;
     max-width: calc(100% - 20px);
-  }
-
-  .modal-content {
-    padding: 25px;
   }
 
   .detail-item {
@@ -506,34 +482,5 @@
   .modal-actions button {
     width: 100%;
     margin-bottom: 10px;
-  }
-}
-
-/* Estilos para el mensaje de éxito del email */
-.email-sent-message {
-  margin-top: 15px;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-  color: white;
-  border-radius: 8px;
-  text-align: center;
-  animation: slideInUp 0.4s ease-out;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-
-.email-sent-message p {
-  margin: 0;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

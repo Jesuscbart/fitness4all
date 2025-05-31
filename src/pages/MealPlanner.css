@@ -164,19 +164,31 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .modal-content {
   background-color: white;
   padding: 25px;
   border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 40px);
   overflow-y: auto;
   position: relative;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.3rem;
+  text-align: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
 }
 
 .close-modal {
@@ -188,6 +200,10 @@
   font-size: 24px;
   cursor: pointer;
   color: #666;
+}
+
+.close-modal:hover {
+  color: #333;
 }
 
 .meal-form {
@@ -228,7 +244,7 @@
   height: 48px;
 }
 
-/* Estilos más específicos para los botones del modal */
+/* Estilos específicos para los botones del modal */
 .meal-form .form-actions .save-button,
 .meal-form .form-actions .delete-button {
   border: none !important;
@@ -272,7 +288,7 @@
   box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3) !important;
 }
 
-/* Estilos responsivos */
+/* Estilos responsive */
 @media (max-width: 1200px) {
   .meal-title {
     font-size: 0.8rem;
@@ -299,7 +315,7 @@
     overflow-x: auto;
   }
   
-  /* Configuración para activar scroll horizontal */
+  /* scroll */
   .calendar-header,
   .calendar-body {
     min-width: 768px;
@@ -312,9 +328,22 @@
   .meal-title {
     font-size: 0.75rem;
   }
+  
+  .modal-overlay {
+    padding: 15px;
+  }
+  
+  .modal-content {
+    max-width: none;
+    padding: 20px;
+    max-height: calc(100vh - 30px);
+  }
+  
+  .form-group textarea {
+    min-height: 80px;
+  }
 }
 
-/* Estilos adicionales para pantallas muy pequeñas */
 @media (max-width: 576px) {
   .calendar-header,
   .calendar-body {
@@ -328,6 +357,20 @@
   
   .calendar-controls h2 {
     order: -1;
+  }
+  
+  .modal-overlay {
+    padding: 10px;
+  }
+  
+  .modal-content {
+    padding: 15px;
+    max-height: calc(100vh - 20px);
+  }
+  
+  .meal-form .form-actions .save-button,
+  .meal-form .form-actions .delete-button {
+    font-size: 14px !important;
   }
 }
 

@@ -5,13 +5,13 @@ import emailjs from '@emailjs/browser';
 
 // Configuración de EmailJS
 const EMAILJS_CONFIG = {
-  // Cuenta original para ejercicios y nutrición
+  // Cuenta original de EmailJS para ejercicios y nutrición
   serviceId: process.env.REACT_APP_EMAILJS_SERVICE_ID,
   exerciseTemplateId: process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
   nutritionTemplateId: process.env.REACT_APP_EMAILJS_NUTRITION_TEMPLATE_ID,
   publicKey: process.env.REACT_APP_EMAILJS_PUBLIC_KEY,
   
-  // Nueva cuenta para listas de compra
+  // Cuenta secundaria de EmailJS para listas de compra
   shoppingServiceId: process.env.REACT_APP_EMAILJS_SHOPPING_SERVICE_ID,
   shoppingTemplateId: process.env.REACT_APP_EMAILJS_SHOPPING_TEMPLATE_ID,
   shoppingPublicKey: process.env.REACT_APP_EMAILJS_SHOPPING_PUBLIC_KEY || process.env.REACT_APP_EMAILJS_PUBLIC_KEY
@@ -78,45 +78,6 @@ const processMarkdownToHTML = (markdownContent) => {
   return processedLines.join('\n');
 };
 
-// Función para generar contenido de texto plano
-export const generateExercisePlanEmailText = (planContent, planTitle, userName) => {
-  const timestamp = new Date().toLocaleString('es-ES', {
-    timeZone: 'Europe/Madrid'
-  });
-
-  return `
-FITNESS4ALL - TU PLAN DE ENTRENAMIENTO PERSONALIZADO
-===================================================
-
-¡Hola ${userName}!
-
-Aquí tienes tu plan de entrenamiento personalizado generado especialmente para ti.
-
-INFORMACIÓN DEL PLAN:
-- Título: ${planTitle}
-- Generado: ${timestamp}
-- Para: ${userName}
-
-CONTENIDO DEL PLAN:
-${planContent}
-
-CONSEJOS PARA SEGUIR TU PLAN:
-• Realiza siempre el calentamiento antes de entrenar
-• Mantén una hidratación adecuada durante el ejercicio
-• Respeta los días de descanso para una buena recuperación
-• Si sientes dolor, detén el ejercicio y consulta a un profesional
-• Guarda este email para consultar tu plan cuando lo necesites
-
-¡A por ello!
-
-Equipo Fitness4All
-Tu entrenador personal virtual
-
----
-© 2024 Fitness4All. Todos los derechos reservados.
-  `.trim();
-};
-
 // Función principal para enviar el email usando EmailJS
 export const sendExercisePlanEmail = async (emailData) => {
   try {
@@ -136,21 +97,13 @@ export const sendExercisePlanEmail = async (emailData) => {
     // Generar contenido procesado para EmailJS template
     const planContentProcessed = processMarkdownToHTML(emailData.planContent);
     
-    const textContent = generateExercisePlanEmailText(
-      emailData.planContent, 
-      emailData.planTitle, 
-      emailData.userName
-    );
-    
     // Preparar datos para EmailJS
     const templateParams = {
       to_email: emailData.to,
       to_name: emailData.userName,
       subject: emailData.subject,
       plan_title: emailData.planTitle,
-      plan_content_raw: emailData.planContent, // Markdown crudo como respaldo
-      plan_content: planContentProcessed, // Contenido HTML procesado para mi template
-      text_content: textContent,
+      plan_content: planContentProcessed,
       from_name: 'Fitness4All',
       timestamp: new Date().toLocaleString('es-ES', {
         timeZone: 'Europe/Madrid',
@@ -201,46 +154,6 @@ export const sendExercisePlanEmail = async (emailData) => {
   }
 };
 
-// Función para generar contenido de texto plano para nutrición
-export const generateNutritionPlanEmailText = (planContent, planTitle, userName) => {
-  const timestamp = new Date().toLocaleString('es-ES', {
-    timeZone: 'Europe/Madrid'
-  });
-
-  return `
-FITNESS4ALL - TU PLAN DE ALIMENTACIÓN PERSONALIZADO
-==================================================
-
-¡Hola ${userName}!
-
-Aquí tienes tu plan de alimentación personalizado generado especialmente para ti.
-
-INFORMACIÓN DEL PLAN:
-- Título: ${planTitle}
-- Generado: ${timestamp}
-- Para: ${userName}
-
-CONTENIDO DEL PLAN:
-${planContent}
-
-CONSEJOS PARA SEGUIR TU PLAN:
-• Planifica tus comidas con anticipación para asegurar el éxito
-• Mantén una hidratación adecuada durante todo el día
-• Respeta los horarios de comida para mantener tu metabolismo activo
-• Adapta las porciones según tu nivel de actividad física
-• Si tienes dudas nutricionales, consulta a un profesional
-• Guarda este email para consultar tu plan cuando lo necesites
-
-¡Disfruta de tu alimentación saludable!
-
-Equipo Fitness4All
-Tu nutricionista personal virtual
-
----
-© 2024 Fitness4All. Todos los derechos reservados.
-  `.trim();
-};
-
 // Función para procesar Markdown de nutrición y convertirlo a HTML bonito
 const processNutritionMarkdownToHTML = (markdownContent) => {
   let html = markdownContent;
@@ -252,7 +165,7 @@ const processNutritionMarkdownToHTML = (markdownContent) => {
   // Convertir texto en negrita **texto** -> <strong>texto</strong>
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #28a745; font-weight: 600;">$1</strong>');
   
-  // Procesar listas: convertir - item en <li>item</li> (exactamente igual que ejercicios)
+  // Procesar listas: convertir - item en <li>item</li>
   const lines = html.split('\n');
   let processedLines = [];
   let inList = false;
@@ -305,7 +218,7 @@ const processNutritionMarkdownToHTML = (markdownContent) => {
 // Función principal para enviar el email de plan de alimentación usando EmailJS
 export const sendNutritionPlanEmail = async (emailData) => {
   try {
-    console.log('Preparando envío de email de plan de alimentación con EmailJS...');
+    console.log('📧 Preparando envío de email de plan de alimentación con EmailJS...');
     console.log('Datos del email:', emailData);
     
     // Validar configuración de EmailJS para nutrición
@@ -318,25 +231,16 @@ export const sendNutritionPlanEmail = async (emailData) => {
       throw new Error(`EmailJS para nutrición no está configurado correctamente. Variables de entorno faltantes: ${missingVars.join(', ')}`);
     }
     
-    // Generar contenido procesado más compacto para EmailJS template
+    // Generar contenido procesado para EmailJS template
     const planContentProcessed = processNutritionMarkdownToHTML(emailData.planContent);
     
-    // Generar contenido de texto más corto
-    const textContent = generateNutritionPlanEmailText(
-      emailData.planContent, 
-      emailData.planTitle, 
-      emailData.userName
-    );
-    
-    // Preparar datos para EmailJS - igual estructura que ejercicios
+    // Preparar datos para EmailJS
     const templateParams = {
       to_email: emailData.to,
       to_name: emailData.userName,
       subject: emailData.subject,
       plan_title: emailData.planTitle,
-      plan_content_raw: emailData.planContent, // Markdown crudo como respaldo
-      plan_content: planContentProcessed, // Contenido HTML procesado igual que ejercicios
-      text_content: textContent,
+      plan_content: planContentProcessed,
       from_name: 'Fitness4All',
       timestamp: new Date().toLocaleString('es-ES', {
         timeZone: 'Europe/Madrid',
@@ -348,8 +252,8 @@ export const sendNutritionPlanEmail = async (emailData) => {
       })
     };
     
-    console.log('Enviando email de plan de alimentación con EmailJS...');
-    console.log('Tamaño del contenido procesado:', planContentProcessed.length, 'caracteres');
+    console.log('📤 Enviando email de plan de alimentación con EmailJS...');
+    console.log('📝 Tamaño del contenido procesado:', planContentProcessed.length, 'caracteres');
     
     // Enviar email usando EmailJS con el template específico de nutrición
     const result = await emailjs.send(
@@ -387,66 +291,6 @@ export const sendNutritionPlanEmail = async (emailData) => {
     
     throw error;
   }
-};
-
-// Configuración de email actualizada
-export const EMAIL_CONFIG = {
-  templates: {
-    exercisePlan: {
-      subject: 'Tu Plan de Entrenamiento Personalizado - Fitness4All',
-      from: 'Fitness4All <noreply@fitness4all.com>'
-    },
-    nutritionPlan: {
-      subject: 'Tu Plan de Alimentación Personalizado - Fitness4All',
-      from: 'Fitness4All Nutrición <noreply@fitness4all.com>'
-    },
-    shoppingList: {
-      subject: 'Tu Lista de la Compra Personalizada - Fitness4All',
-      from: 'Fitness4All Compras <noreply@fitness4all.com>'
-    }
-  }
-};
-
-// Función para generar contenido de texto plano para lista de compra
-export const generateShoppingListEmailText = (listContent, listTitle, userName, weekInfo, peopleCount) => {
-  const timestamp = new Date().toLocaleString('es-ES', {
-    timeZone: 'Europe/Madrid'
-  });
-
-  return `
-FITNESS4ALL - TU LISTA DE LA COMPRA INTELIGENTE
-==============================================
-
-¡Hola ${userName}!
-
-Aquí tienes tu lista de la compra inteligente generada especialmente para ti.
-
-INFORMACIÓN DE LA LISTA:
-- Título: ${listTitle}
-- ${weekInfo}
-- Personas: ${peopleCount}
-- Generado: ${timestamp}
-- Para: ${userName}
-
-CONTENIDO DE LA LISTA:
-${listContent}
-
-CONSEJOS PARA UNA COMPRA EFICIENTE:
-• Sigue el orden de las categorías según el layout de tu supermercado
-• Revisa tu nevera antes de ir de compra para evitar duplicados
-• Elige ingredientes frescos y de temporada cuando sea posible
-• Verifica las fechas de caducidad, especialmente en productos perecederos
-• Compara precios y considera marcas alternativas para optimizar tu presupuesto
-• Guarda este email para consultar tu lista cuando vayas de compras
-
-¡Disfruta de tu compra inteligente!
-
-Equipo Fitness4All
-Tu asistente de compras inteligente
-
----
-© 2024 Fitness4All. Todos los derechos reservados.
-  `.trim();
 };
 
 // Función para procesar Markdown de lista de compra y convertirlo a HTML bonito
@@ -537,22 +381,13 @@ export const sendShoppingListEmail = async (emailData) => {
     // Generar contenido procesado para EmailJS template
     const listContentProcessed = processShoppingListMarkdownToHTML(emailData.listContent);
     
-    // Generar contenido de texto
-    const textContent = generateShoppingListEmailText(
-      emailData.listContent, 
-      emailData.listTitle, 
-      emailData.userName,
-      emailData.weekInfo,
-      emailData.peopleCount
-    );
-    
     // Preparar datos para EmailJS (nueva cuenta)
     const templateParams = {
       to_email: emailData.to,
       to_name: emailData.userName,
       subject: emailData.subject,
       list_title: emailData.listTitle,
-      list_content: listContentProcessed, // Contenido HTML procesado
+      list_content: listContentProcessed,
       week_info: emailData.weekInfo,
       people_count: emailData.peopleCount,
       generated_date: new Date().toLocaleDateString('es-ES', {
@@ -561,7 +396,6 @@ export const sendShoppingListEmail = async (emailData) => {
         month: 'long', 
         day: 'numeric'
       }),
-      text_content: textContent,
       from_name: 'Fitness4All',
       timestamp: new Date().toLocaleString('es-ES', {
         timeZone: 'Europe/Madrid',
